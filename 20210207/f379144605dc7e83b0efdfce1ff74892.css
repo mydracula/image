@@ -1,0 +1,8 @@
+div#comment {
+    display: none;
+}
+
+img.lozaded {
+    display: inline-block;
+    max-height: 2.5rem;
+}

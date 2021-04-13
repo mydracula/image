@@ -1,0 +1,11 @@
+div#comment {
+    display: none;
+}
+
+img.lozaded {
+    display: inline-block;
+}
+
+.vpower.txt-right {
+    display: none;
+}

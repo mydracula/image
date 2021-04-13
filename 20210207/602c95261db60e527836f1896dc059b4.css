@@ -1,0 +1,15 @@
+div#comment {
+    display: none;
+}
+
+img.lozaded {
+    display: inline-block;
+}
+
+.vpower.txt-right {
+    display: none;
+}
+
+span.vicon.vemoji-btn {
+    display: none !important;
+}

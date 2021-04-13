@@ -1,0 +1,3 @@
+{% for link in theme.inject.head %}
+<link rel="stylesheet" href="{{ url_for(link) }}">
+{% endfor %}

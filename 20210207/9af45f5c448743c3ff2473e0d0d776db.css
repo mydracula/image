@@ -1,0 +1,14 @@
+div#comment {
+    display: none;
+}
+
+.vpower.txt-right {
+    display: none;
+}
+
+img[src^="https://cdn.jsdelivr.net/gh/Dreamy-TZK/iemotion-pic@latest"] {
+    vertical-align: bottom;
+    display: inline-block;
+    max-width: 25px;
+    max-height: 1.5rem;
+}

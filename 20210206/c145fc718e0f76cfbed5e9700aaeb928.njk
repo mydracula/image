@@ -1,0 +1,3 @@
+{% for script in theme.inject.bottom %}
+    <script src="{{ url_for(script) }}"></script>
+{% endfor %}
