@@ -49,6 +49,9 @@ export default {
             lineStyle: {
               color: '#00A8FF' // 坐标轴线线的颜色
             }
+          },
+          axisLabel: { // 坐标轴刻度标签的相关设置。
+            interval: 0 // x轴完整显示
           }
         },
         yAxis: {
