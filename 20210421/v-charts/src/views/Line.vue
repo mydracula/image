@@ -255,6 +255,7 @@ export default {
     getMonth() {
       this.isActive = 1
       let newOption = this.Echart.getOption()
+      newOption.xAxis[0].data = ['1点', '2点', '3点', '4点', '5点', '6点', '7点']
       newOption.series[0].data = [100, 144, 243, 382, 888, 699, 900]
       this.Echart.setOption(newOption, true)
     },
