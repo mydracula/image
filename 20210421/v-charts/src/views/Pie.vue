@@ -2,6 +2,7 @@
   <div class="charts">
     <ve-pie height="290px" width="100%" :extend="pieExt2"></ve-pie>
     <ve-pie :extend="chartExtendPie" :colors="colors"></ve-pie>
+    <ve-pie :data="pieData"></ve-pie>
   </div>
 </template>
 
@@ -126,6 +127,13 @@ export default {
             { value: 16, name: '其他1' }
           ]
         }
+      },
+      pieData: {
+        columns: ['name', 'value'],
+        rows: [
+          { name: '设备', value: 30 },
+          { name: '企业', value: 28 }
+        ]
       }
     }
   }
