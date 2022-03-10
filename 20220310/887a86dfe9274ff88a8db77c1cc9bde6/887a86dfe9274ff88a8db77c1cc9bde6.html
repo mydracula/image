@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>demo | vue-amap</title>
+  <meta charset="UTF-8">
+</head>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<body>
+  <div id="app">
+
+  </div>
+</body>
+
+
+<!-- 先引入 Vue -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cn.vuejs.org/js/vue.js"></script>
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return {}
+    },
+    created() {
+      console.log(this.Decrypt('8UjS0zhaMy1vspfqL3a87Q=='), 'jiemi');
+      console.log(this.Encrypt('123'), 'jiami')
+    },
+    methods: {
+      Decrypt(cipher) {
+        const options = {
+          key: CryptoJS.enc.Utf8.parse('qTZzeZqiCiKU0jwy'),
+          iv: CryptoJS.enc.Utf8.parse('8Xn9QkIb0QHqMuCe'),
+          mode: CryptoJS.mode['CBC'],
+          pad: CryptoJS.pad['Pkcs7']
+        }
+
+        cipher = CryptoJS.AES.decrypt(cipher, options.key, {
+          iv: options.iv,
+          mode: options.mode,
+          padding: options.pad
+        });
+        cipher = CryptoJS.enc.Utf8.stringify(cipher);
+        return cipher
+
+      },
+      Encrypt(word) {
+        const options = {
+          key: CryptoJS.enc.Utf8.parse('qTZzeZqiCiKU0jwy'),
+          iv: CryptoJS.enc.Utf8.parse('8Xn9QkIb0QHqMuCe'),
+          mode: CryptoJS.mode['CBC'],
+          pad: CryptoJS.pad['Pkcs7']
+        }
+        word = CryptoJS.AES.encrypt(word, options.key, {
+          iv: options.iv,
+          mode: options.mode,
+          padding: options.pad
+        })
+        word = word.toString()
+        return word
+      }
+    }
+  });
+</script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body,
+  #app,
+  #container {
+    height: 100%;
+  }
+</style>
+
+</html>
