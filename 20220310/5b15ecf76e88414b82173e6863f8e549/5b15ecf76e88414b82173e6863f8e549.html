@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="UTF-8">
+</head>
+
+<body>
+  <div id="app">
+
+    <Top></Top>
+    <List></List>
+    <Bottom></Bottom>
+  </div>
+
+</body>
+<!-- 先引入 Vue -->
+<script src="https://cn.vuejs.org/js/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+  Vue.config.productionTip = false
+
+  const Top = Vue.extend({
+    name: "Top",
+    template: '<p>123</p>',
+    data: function () {
+      return {
+
+      }
+    }
+  })
+
+
+  const Item = Vue.extend({
+    name: "Item",
+    template: '<p>456</p>',
+    data: function () {
+      return {
+
+      }
+    }
+  })
+
+  const List = Vue.extend({
+    name: "List",
+    template: '<Item></Item>',
+    components: {
+      Item
+    },
+    data: function () {
+      return {
+
+      }
+    }
+  })
+
+
+
+  const Bottom = Vue.extend({
+    name: "Bottom",
+    template: '<p>123</p>',
+    data: function () {
+      return {
+
+      }
+    }
+  })
+
+  const vm = new Vue({
+    el: '#app',
+    components: {
+      Top,
+      Bottom,
+      List
+    },
+    data: function () {
+      return {
+
+      }
+    },
+    methods: {
+
+    },
+
+  });
+</script>
+
+<style>
+
+</style>
+
+</html>
