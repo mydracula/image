@@ -1,0 +1,33 @@
+[09:01:29][I] Uperf v2 (21.02.28), by Matt Yang (yccy@outlook.com)
+[09:01:29][I] Daemon: Start
+[09:01:29][I] Daemon: New uperf(pid=31612) is loading config file
+[09:01:29][I] Uperf: Initializing
+[09:01:29][I] CfgMgr: Using [sdm888[21.02.28]] by [yc@coolapk]
+[09:01:29][I] CfgMgr: Bind None -> normal
+[09:01:29][I] CfgMgr: Bind Active -> active
+[09:01:29][I] CfgMgr: Bind Pressed -> interaction
+[09:01:29][I] CfgMgr: Bind Tap -> interaction
+[09:01:29][I] CfgMgr: Bind Swipe -> interaction
+[09:01:29][I] CfgMgr: Bind HeavyLoad -> heavyLoad
+[09:01:29][I] CfgMgr: Bind SfLag -> sfLag
+[09:01:29][I] CfgMgr: Bind SsAnim -> heavyLoad
+[09:01:29][I] CfgMgr: Ignored knobs in action root/powermodes/balance/actions/sfLag:
+[09:01:29][I] CfgMgr: schedBoost topBoost heavyBoost llccBwMax ddrBwMax ddrLatBig dispFeature 
+[09:01:29][I] CfgMgr: Ignored knobs in action root/powermodes/powersave/actions/sfLag:
+[09:01:29][I] CfgMgr: schedBoost topBoost heavyBoost llccBwMax ddrBwMax ddrLatBig dispFeature 
+[09:01:29][I] CfgMgr: Ignored knobs in action root/powermodes/performance/actions/sfLag:
+[09:01:29][I] CfgMgr: schedBoost topBoost heavyBoost llccBwMax ddrBwMax ddrLatBig dispFeature 
+[09:01:29][I] CfgMgr: Read default powermode from /data/uperf_powermode
+[09:01:29][I] CfgMgr: Powermode "(null)" -> "balance"
+[09:01:29][I] InputReader: Enabled by config file
+[09:01:29][I] InputReader: dev:"touchpanel" x:0~1439 y:0~3215
+[09:01:29][I] LoadMonitor: Enabled by config file
+[09:01:29][I] AffinityHelper: Enabled by config file
+[09:01:29][I] AffinityHelper: all=ff norm=7f ulv=3 pwr=f mid=70 perf=f0 prime=80
+[09:01:29][I] DispFeature: Enabled by config file
+[09:01:30][E] DispFeature: Default rule not specified
+[09:01:30][I] SfAnalysis: Enabled by config file
+[09:01:30][I] SsAnalysis: Enabled by config file
+[09:01:30][I] Uperf: Running
+[09:01:32][I] SfAnalysis: Surfaceflinger analysis connected
+[09:02:39][I] SsAnalysis: Systemserver analysis connected
