@@ -1,1 +1,31 @@
 vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIiIsDQogICJhZGQiOiAic2cuc3NlcnZlci50b3AiLA0KICAicG9ydCI6ICI4MCIsDQogICJpZCI6ICJiY2UyYTM3MS1mM2Y2LTM4YmItYWM1OS0xNjJkZGYxNGE2M2UiLA0KICAiYWlkIjogIjAiLA0KICAic2N5IjogImF1dG8iLA0KICAibmV0IjogIndzIiwNCiAgInR5cGUiOiAibm9uZSIsDQogICJob3N0IjogIiIsDQogICJwYXRoIjogIi93cy1zZyIsDQogICJ0bHMiOiAiIiwNCiAgInNuaSI6ICIiDQp9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 2022年3月21日 13点54分 禁二传
+地址: sg.sserver.top
+端口: 80
+AlterId: 0
+UUID: bce2a371-f3f6-38bb-ac59-162ddf14a63e
+传输协议: ws
+路径: /ws-sg
+VMess链接: vmess://eyJob3N0IjoicHVsbC5mcmVlLnZpZGVvLjEwMDEwLmNvbSIsInBhdGgiOiIvd3Mtc2ciLCJ0bHMiOiIiLCJ2ZXJpZnlfY2VydCI6dHJ1ZSwiYWRkIjoic2cuc3NlcnZlci50b3AiLCJwb3J0Ijo4MCwiYWlkIjowLCJuZXQiOiJ3cyIsImhlYWRlclR5cGUiOiJodHRwIiwidiI6IjIiLCJ0eXBlIjoidm1lc3MiLCJwcyI6IuaWsOWKoOWdoSAxRyA4MCB3cyIsInJlbWFyayI6IuaWsOWKoOWdoSAxRyA4MCB3cyIsImlkIjoiYmNlMmEzNzEtZjNmNi0zOGJiLWFjNTktMTYyZGRmMTRhNjNlIiwiY2xhc3MiOjJ9
+
+
+
+
+
+
+
