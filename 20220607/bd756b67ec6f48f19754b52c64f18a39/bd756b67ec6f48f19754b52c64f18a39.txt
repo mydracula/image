@@ -1,0 +1,113 @@
+[Input Path]: D:\WeChat\WeChat Files\wxid_og9q7r15iu9q22\FileStorage\File\2022-06\1654175323660599.mpeg4.aac.mp4
+[Output Path]: D:\WeChat\WeChat Files\wxid_og9q7r15iu9q22\FileStorage\File\2022-06\1654175323660599.mpeg4.aac.mpeg4.aac.mp4
+ 
+[Video Info]:
+File Name: 1654175323660599.mpeg4.aac.mp4
+File Size (Bytes): 5,432,803
+ 
+[Format]
+Format (Short Name): mov,mp4,m4a,3gp,3g2,mj2
+Format (Long Name): QuickTime / MOV
+Duration: 00:05:31.14
+Duration (Microseconds): 331,144,000
+Bit Rate (bits/sec): 131,249
+Number of Streams: 2
+ 
+[Metadata]
+major_brand: isom
+minor_version: 512
+compatible_brands: isomiso2mp41
+title: Dogs (Original Version)
+artist: HVOB
+album: HVOB
+encoder: Lavf58.5.100
+ 
+[Stream #0]
+Type: Video
+Codec (Short Name): mpeg4
+Long (Short Name): MPEG-4 part 2
+Codec Tag: 0x7634706d
+Codec Tag (String): mp4v
+Codec Time Base: 1/60
+Time Base: 1/15360
+Real Base Frame Rate: 60/1
+Average Frame Rate: 60/1
+Duration: 00:00:00.14
+Duration (Microseconds): 256
+Bit Rate (bits/sec): 21,766,080
+Number of Frames: 1
+ 
+Width: 640
+Height: 640
+Pixel Aspect Ratio: 1:1
+Display Aspect Ratio: 1:1
+Pixel Formal: yuv420p
+Has B Frames: No
+ 
+[Metadata]
+language: und
+handler_name: VideoHandler
+ 
+[Stream #1]
+Type: Audio
+Codec (Short Name): aac
+Long (Short Name): AAC (Advanced Audio Coding)
+Codec Tag: 0x6134706d
+Codec Tag (String): mp4a
+Codec Time Base: 1/44100
+Time Base: 1/44100
+Real Base Frame Rate: 0/0
+Average Frame Rate: 0/0
+Duration: 00:00:14.14
+Duration (Microseconds): 14,603,416
+Bit Rate (bits/sec): 128,737
+Number of Frames: 14,262
+ 
+Channels: 2
+Sample Rate (Hz): 44,100
+Sample Data Format: 32 bits (Float) 
+ 
+[Metadata]
+language: und
+handler_name: SoundHandler
+ 
+ 
+[FFmpeg Command]:
+C:\Users\Administrator\Downloads\Compressed\optional_tools\ffmpeg.exe -probesize 100M -analyzeduration 100M -i "D:\WeChat\WeChat Files\wxid_og9q7r15iu9q22\FileStorage\File\2022-06\1654175323660599.mpeg4.aac.mp4" -y -vcodec mpeg4 -threads 12 -g 300 -b:v 1000000 -r 60 -s 640x640 -vf "setsar=1" -max_muxing_queue_size 9999 -f mp4 -acodec aac -strict experimental -ar 44100 -ac 2 -ab 128000 "D:\WeChat\WeChat Files\wxid_og9q7r15iu9q22\FileStorage\File\2022-06\_TMP.mp4" 
+ 
+[FFmpeg Output]:
+ffmpeg version N-89861-g78e884f-Reino Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 7.1.0 (GCC)
+  configuration: --arch=x86_64 --target-os=mingw32 --cross-prefix=/ffmpeg/builds/sandbox/cross_compilers/mingw-w64-x86_64/bin/x86_64-w64-mingw32- --pkg-config=pkg-config --pkg-config-flags=--static --extra-version=Reino --enable-gray --enable-version3 --disable-debug --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-w32threads --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libfreetype --enable-libfribidi --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --enable-gpl --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-librubberband --enable-libvidstab --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-amf --enable-libmfx --enable-avresample --extra-cflags='-mtune=generic' --extra-cflags=-O2 --extra-cflags=-pipe --extra-cflags=-s --optflags=-O2 --enable-static --disable-shared --prefix=/ffmpeg/builds/sandbox/cross_compilers/mingw-w64-x86_64/x86_64-w64-mingw32
+  libavutil      56.  7.100 / 56.  7.100
+  libavcodec     58.  9.100 / 58.  9.100
+  libavformat    58.  5.100 / 58.  5.100
+  libavdevice    58.  0.101 / 58.  0.101
+  libavfilter     7. 11.101 /  7. 11.101
+  libavresample   4.  0.  0 /  4.  0.  0
+  libswscale      5.  0.101 /  5.  0.101
+  libswresample   3.  0.101 /  3.  0.101
+  libpostproc    55.  0.100 / 55.  0.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\WeChat\WeChat Files\wxid_og9q7r15iu9q22\FileStorage\File\2022-06\1654175323660599.mpeg4.aac.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2mp41
+    title           : Dogs (Original Version)
+    artist          : HVOB
+    album           : HVOB
+    encoder         : Lavf58.5.100
+  Duration: 00:05:31.14, start: 0.000000, bitrate: 131 kb/s
+    Stream #0:0(und): Video: mpeg4 (Simple Profile) (mp4v / 0x7634706D), yuv420p, 640x640 [SAR 1:1 DAR 1:1], 21766 kb/s, 60 fps, 60 tbr, 15360 tbn, 60 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+    Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+Stream mapping:
+  Stream #0:0 -> #0:0 (mpeg4 (native) -> mpeg4 (native))
+  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
+Press [q] to stop, [?] for helpToo many packets buffered for output stream 0:1.
+[aac @ 0000018913e25240] Qavg: 303.737
+[aac @ 0000018913e25240] 2 frames left in the queue on closing
+Conversion failed!
