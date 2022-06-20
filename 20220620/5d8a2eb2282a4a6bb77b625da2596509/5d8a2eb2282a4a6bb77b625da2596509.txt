@@ -1,0 +1,76 @@
+1.vue之间的组件通信
+	props / $emit
+	ref / $refs
+	eventBus事件总线（$emit / $on）
+	依赖注入（provide / inject）
+	$parent / $children
+	$attrs / $listeners
+2.实现自定义指令基本工作流程开发过程
+3.vue中的内置组件
+	keepalive原理，某些场景下主动销毁keep-alive包裹的某个组件
+	component
+	transition
+	插槽 作用域插槽 （组件通信的一种）
+4.ts常用关键字的功能
+5.vue3双向绑定和vue2双向绑定的区别，vue2是如何解决的
+	与Object.defineProperty不同 的是Object.defineProperty只能劫持对象的属性，而Proxy是直接代理对象。因为proxy是对整个对象进行代理，所以可以监听对象某个属性值的变化，还可以监听对象属性的新增和删除，而且还可以监听数组。
+6.es6及es6以后的特性
+	let和const
+	模板运算符
+	解构表达式
+	函数默认值
+	箭头函数
+	对象函数属性简写
+	扩展运算符
+	Promise
+	模块化
+	类
+7.class或者es5构造函数面向对象的功能开发流程
+8.关于异步的特性
+	回调函数/定时器/事件监听/ajax/promise.then
+	除了promise.then和async之外的异步方法 （Promise Generator函数/第三方库 async.js）
+	关于promise静态方法有哪些  Promise.resolve() Promise.reject()  Promise.allSettled()  
+9.原生小程序的开发
+	小程序优化处理哪些方面具体一点
+	拆分组件可以提升性能，那为什么要拆分组件
+	小程序的渲染机制
+10.浅拷贝和深拷贝的区别
+	什么是深拷贝，什么是浅拷贝
+	实现深拷贝的方式
+	JSON转化和递归转化有什么区别，相比递归有哪些缺陷
+11.canvas动画 svg动画有没有做过
+12.css的两种动画，优化手段
+13.职业规划和学习计划
+14.对公司有哪些期望，什么公司符合预期
+15  响应式数据
+	响应式数据
+      1，data声明的数据会被遍历使用 使用Object.defineProperty 进行定义
+ 	每一个属性都会有自己的  getter 和 setter
+      2，每一个组件都会有一个 watcher 观察者，会对data中的数据进行收集需要监听的依赖
+	如果data中的数据发生了改变，就要通知组件进行重新编译
+      3，会有专门渲染template的函数，例如render，用来将定义的标签模板编译为虚拟DOM
+	如果虚拟DOM编译完毕，会找对应得盒子映射到页面中
+      4，如果将来组件内部的数据发生改变，则在最后编译虚拟DOM的时候
+	新旧虚拟DOM会产生对比，通过diff算法，找到需要更新的那个标签进行重新渲染即可
+	
+Http和Https的区别？
+
+1.https协议需要到ca申请证书，一般免费证书较少，因而需要一定费用。
+2.http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。
+3.http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。
+4.http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全(无状态的意思是其数据包的发送、传输和接收都是相互独立的。无连接的意思是指通信双方都不长久的维持对方的任何信息)
+
+
+vue实现双向数据绑定的原理?
+vue.js 则是采用数据劫持结合发布者-订阅者模式的方式，通过Object.defineProperty()来劫持各个属性的setter，getter，在数据变动时发布消息给订阅者，触发相应的监听回调。
+第一步： 需要observer(观察者)对数据对象进行递归遍历，包括子属性对象的属性，都加上 setter和getter
+这样的话，给这个对象的某个值赋值，就会触发setter，那么就能监听到了数据变化
+
+第二步： compile(模板解析器)解析模板指令，将模板中的变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，更新视图
+
+第三步： Watcher(订阅者)是Observer和Compile之间通信的桥梁，主要做的事情是:
+1、在自身实例化时往属性订阅器(dep)里面添加自己
+2、自身必须有一个update()方法
+3、待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调，则功成身退。
+
+第四步： MVVM作为数据绑定的入口，整合Observer、Compile和Watcher三者，通过Observer来监听自己的model数据变化，通过Compile来解析编译模板指令，最终利用Watcher搭起Observer和Compile之间的通信桥梁，达到数据变化 -> 视图更新；视图交互变化(input) -> 数据model变更的双向绑定效果。
