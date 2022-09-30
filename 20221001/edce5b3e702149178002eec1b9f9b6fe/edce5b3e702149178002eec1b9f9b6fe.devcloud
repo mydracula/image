@@ -1,0 +1,4 @@
+# 线上开发
+NODE_ENV=devCloud
+VUE_APP_BASE_API = '/dev-api'
+VUE_CLI_BABEL_TRANSPILE_MODULES = true
