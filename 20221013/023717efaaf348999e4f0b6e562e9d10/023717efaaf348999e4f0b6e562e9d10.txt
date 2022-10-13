@@ -1,0 +1,284 @@
+[
+    {
+        "excerpt": {
+            "type": "root",
+            "children": [
+                {
+                    "type": "element",
+                    "tag": "h2",
+                    "props": {
+                        "id": "getting-started"
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Getting started"
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "p",
+                    "props": {
+                        
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Empower your NuxtJS application with "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "code-inline",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "@nuxtjs/content"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": " module: write in a "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "code-inline",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "content/"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": " directory and fetch your Markdown, JSON, YAML and CSV files through a MongoDB like API, acting as a "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "strong",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "Git-based Headless CMS"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": "."
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "h2",
+                    "props": {
+                        "id": "writing-content"
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Writing content"
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "p",
+                    "props": {
+                        
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Learn how to write your "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "code-inline",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "content/"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": ", supporting Markdown, YAML, CSV and JSON: "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "a",
+                            "props": {
+                                "href": "https://content.nuxtjs.org/writing",
+                                "rel": [
+                                    "nofollow",
+                                    "noopener",
+                                    "noreferrer"
+                                ],
+                                "target": "_blank"
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "https://content.nuxtjs.org/writing"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": "."
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "h2",
+                    "props": {
+                        "id": "fetching-content"
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Fetching content"
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "p",
+                    "props": {
+                        
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Learn how to fetch your content with "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "code-inline",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "$content"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": ": "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "a",
+                            "props": {
+                                "href": "https://content.nuxtjs.org/fetching",
+                                "rel": [
+                                    "nofollow",
+                                    "noopener",
+                                    "noreferrer"
+                                ],
+                                "target": "_blank"
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "https://content.nuxtjs.org/fetching"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": "."
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "h2",
+                    "props": {
+                        "id": "displaying-content"
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Displaying content"
+                        }
+                    ]
+                },
+                {
+                    "type": "element",
+                    "tag": "p",
+                    "props": {
+                        
+                    },
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Learn how to display your Markdown content with the "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "code-inline",
+                            "props": {
+                                
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "<nuxt-content>"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": " component directly in your template: "
+                        },
+                        {
+                            "type": "element",
+                            "tag": "a",
+                            "props": {
+                                "href": "https://content.nuxtjs.org/displaying",
+                                "rel": [
+                                    "nofollow",
+                                    "noopener",
+                                    "noreferrer"
+                                ],
+                                "target": "_blank"
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": "https://content.nuxtjs.org/displaying"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "value": "."
+                        }
+                    ]
+                }
+            ]
+        },
+    }
+]
