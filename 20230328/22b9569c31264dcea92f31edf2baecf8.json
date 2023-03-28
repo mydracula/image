@@ -1,0 +1,17 @@
+{
+  "name": "PyCharm",
+  "version": "2021.2.1",
+  "buildNumber": "212.5080.64",
+  "productCode": "PC",
+  "dataDirectoryName": "PyCharmCE2021.2",
+  "svgIconPath": "bin/pycharm.svg",
+  "launch": [
+    {
+      "os": "Windows",
+      "launcherPath": "bin/pycharm64.exe",
+      "javaExecutablePath": "jbr/bin/java.exe",
+      "vmOptionsFilePath": "bin/pycharm64.exe.vmoptions"
+    }
+  ],
+  "customProperties": []
+}
