@@ -1,0 +1,199 @@
+### 我
+
+```
+  var controller = {
+    el: null,
+    btns: {},
+    step: 'next',
+    create: function () {
+      if(!t.player.options.controls)
+        return
+
+      var that = this
+      t.player.options.controls.forEach(function(item) {
+        if(that.btns[item])
+          return;
+
+        var opt = {
+          onclick: function(event){
+            that.events[item] ? that.events[item](event) : t.player.options.events[item](event)
+          }
+        }
+
+        switch(item) {
+          case 'volume':
+            opt.className = ' ' + (source.muted ? 'off' : 'on')
+            opt.innerHTML = '<div class="bar"></div>'
+            opt['on'+utils.nameMap.dragStart] = that.events['volume']
+            opt.onclick = null
+            break;
+          case 'mode':
+            opt.className = ' ' + t.player.options.mode
+            break;
+          default:
+            opt.className = ''
+            break;
+        }
+
+        opt.className = item + opt.className + ' btn'
+
+        that.btns[item] = that.el.createChild('div', opt)
+      })
+
+      that.btns['volume'].bar = that.btns['volume'].child('.bar')
+    },
+    events: {
+      mode: function(e) {
+        switch(t.player.options.mode) {
+          case 'loop':
+            t.player.options.mode = 'random'
+            break;
+          case 'random':
+            t.player.options.mode = 'order'
+            break;
+          default:
+            t.player.options.mode = 'loop'
+        }
+
+        controller.btns['mode'].className = 'mode ' + t.player.options.mode + ' btn'
+        store.set('_PlayerMode', t.player.options.mode)
+      },
+      volume: function(e) {
+        e.preventDefault()
+
+        var current = e.currentTarget
+
+        var drag = false
+
+        var thumbMove = function(e) {
+          e.preventDefault()
+          t.player.volume(controller.percent(e, current))
+          drag = true
+        };
+
+        var thumbUp = function(e) {
+          e.preventDefault()
+          current.removeEventListener(utils.nameMap.dragEnd, thumbUp)
+          current.removeEventListener(utils.nameMap.dragMove, thumbMove)
+          if(drag) {
+            t.player.muted()
+            t.player.volume(controller.percent(e, current))
+          } else {
+            if (source.muted) {
+              t.player.muted()
+              t.player.volume(source.volume)
+            } else {
+              t.player.muted('muted')
+              controller.update(0)
+            }
+          }
+        };
+
+        current.addEventListener(utils.nameMap.dragMove, thumbMove)
+        current.addEventListener(utils.nameMap.dragEnd, thumbUp)
+      },
+      backward: function(e) {
+        controller.step = 'prev'
+        t.player.mode()
+      },
+      forward: function(e) {
+        controller.step = 'next'
+        t.player.mode()
+      },
+    },
+    update: function(percent) {
+      controller.btns['volume'].className = 'volume '+ (!source.muted && percent > 0? 'on' :'off') +' btn'
+      controller.btns['volume'].bar.width(Math.floor(percent * 100) + '%')
+    },
+    percent: function(e, el) {
+      var percentage = ((e.clientX || e.changedTouches[0].clientX) - el.left()) / el.width();
+      percentage = Math.max(percentage, 0);
+      return Math.min(percentage, 1);
+    }
+  }
+
+  var events = {
+    onerror: function() {
+      playlist.error()
+      t.player.mode()
+    },
+    ondurationchange: function() {
+      if (source.duration !== 1) {
+        progress.el.attr('data-dtime', utils.secondToTime(source.duration))
+      }
+    },
+    onloadedmetadata: function() {
+      t.player.seek(0)
+      progress.el.attr('data-dtime', utils.secondToTime(source.duration))
+    },
+    onplay: function() {
+      t.parentNode.addClass('playing')
+      showtip(this.attr('title'))
+      NOWPLAYING = t
+    },
+    onpause: function() {
+      t.parentNode.removeClass('playing')
+      NOWPLAYING = null
+    },
+    ontimeupdate: function() {
+      if(!this.disableTimeupdate) {
+        progress.update(this.currentTime / this.duration)
+        lyrics.update(this.currentTime)
+      }
+    },
+    onended: function(argument) {
+      t.player.mode()
+      t.player.play()
+    }
+  }
+```
+
+中文解释代码
+
+
+
+### ChatGPT
+
+这段代码是一个控制器对象，用于处理音乐播放器的控制操作。代码中定义了一个`controller`对象，包含了一些属性和方法。
+
+属性：
+- `el`：表示控制器的DOM元素。
+- `btns`：一个对象，用于存储不同控制按钮的DOM元素。
+- `step`：表示播放器的播放模式，可选值为'next'或'prev'。
+
+方法：
+- `create`：创建控制器按钮。根据传入的`controls`选项，遍历创建不同的按钮，并添加相应的事件处理函数。
+- `events`：一个包含不同控制按钮的事件处理函数的对象。根据不同的按钮类型，执行不同的操作。
+- `update`：更新音量控制按钮的样式和进度条的宽度。
+- `percent`：计算进度条的百分比。
+
+此外，代码中还定义了一个`events`对象，包含了一些音乐播放器的事件处理函数，例如播放、暂停、播放结束等。
+
+整体来说，这段代码实现了音乐播放器的控制功能，包括音量控制、播放模式切换等操作。
+
+
+
+### 我
+
+详细说说
+
+
+
+### ChatGPT
+
+这段代码是一个音乐播放器的控制器对象，用于处理音乐播放器的控制操作。代码中定义了一个名为`controller`的对象，它包含了一些属性和方法。
+
+首先，我们来看一下属性部分：
+- `el`：表示控制器的DOM元素，它的值为null。在`create`方法中，会将实际的DOM元素赋值给它。
+- `btns`：一个对象，用于存储不同控制按钮的DOM元素。在`create`方法中，根据传入的`controls`选项，遍历创建不同的按钮，并将它们存储在`btns`对象中。
+- `step`：表示播放器的播放模式，它的初始值为'next'。在`events`对象的事件处理函数中，根据`step`的值执行不同的操作。
+
+接下来，我们来看一下方法部分：
+- `create`方法：该方法用于创建控制器按钮。首先，它会检查`t.player.options.controls`是否存在，如果不存在则直接返回。然后，它遍历`t.player.options.controls`数组，对每个控制按钮进行处理。如果该按钮已经存在，则直接返回，否则根据按钮类型进行创建。在创建按钮的过程中，还会添加相应的事件处理函数。最后，将创建的按钮存储在`btns`对象中。
+- `events`方法：该方法是一个包含不同控制按钮的事件处理函数的对象。根据不同的按钮类型，执行不同的操作。例如，当点击`mode`按钮时，会根据当前的播放模式切换到下一个播放模式，并更新按钮的样式。当点击`volume`按钮时，会进行音量控制的处理。
+- `update`方法：该方法用于更新音量控制按钮的样式和进度条的宽度。根据当前的音量和静音状态，更新按钮的样式。并根据音量的百分比，更新进度条的宽度。
+- `percent`方法：该方法用于计算进度条的百分比。根据鼠标点击或触摸事件的位置和进度条的宽度，计算出进度条的百分比。
+
+除了`controller`对象，代码中还定义了一个`events`对象，包含了一些音乐播放器的事件处理函数。例如，当发生错误时，会调用`playlist.error()`方法和`player.mode()`方法进行错误处理。当音乐播放结束时，会调用`player.mode()`方法和`player.play()`方法进行播放模式切换和重新播放。
+
+综上所述，这段代码实现了音乐播放器的控制功能，包括音量控制、播放模式切换等操作。它通过控制器对象的属性和方法来管理和处理不同的控制操作，从而实现了音乐播放器的控制功能。
