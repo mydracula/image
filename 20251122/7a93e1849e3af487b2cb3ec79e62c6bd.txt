@@ -1,0 +1,48 @@
+# 1. 先创建目录 先不创建
+mkdir -p /usr/local/x-ui && cd /root
+
+# 2. 把手机下载的两个文件上传到服务器
+#    在 ServerBox 左上角点 ☰ → Files → Local → 找到刚下载的两个文件
+#    长按两个文件 → Upload → 上传到 /root 目录
+#    （上传完你会看到文件名出现在屏幕上）
+
+#-------------------------------
+# 3. 安装 Xray（amd64）
+
+sudo apt update && sudo apt install unzip -y
+
+unzip /root/Xray-linux-64.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/xray
+
+# 如果你是 arm64 服务器，执行这句代替上面：
+# unzip /root/Xray-linux-arm64-v8a.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/xray
+
+# 4. 安装 3x-ui（amd64）
+tar -zxvf /root/x-ui-linux-amd64.tar.gz -C /usr/local/ && chmod +x /usr/local/x-ui/x-ui*
+
+# arm64 服务器执行这句：
+# tar -zxvf /root/x-ui-linux-arm64.tar.gz -C /usr/local/x-ui/ && chmod +x /usr/local/x-ui/x-ui*
+
+# 5. 创建数据库 + 服务
+mkdir -p /etc/x-ui && sqlite3 /etc/x-ui/x-ui.db "vacuum;"
+
+cat > /etc/systemd/system/x-ui.service <<EOF
+[Unit]
+Description=3X-UI Service
+After=network.target
+[Service]
+Type=simple
+ExecStart=/usr/local/x-ui/x-ui
+WorkingDirectory=/usr/local/x-ui/
+Environment="XRAY_VMESS_AEAD_FORCED=false"
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload && systemctl enable x-ui --now
+
+#-------------------------------
+
+
+# 6. 设置账号密码（改成你自己的！）
+/usr/local/x-ui/x-ui setting -username tony -password tony -port 2053
