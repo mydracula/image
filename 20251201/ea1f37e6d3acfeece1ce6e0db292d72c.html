@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>视频+密码验证轻应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            padding: 15px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .top-video {
+            width: 100%;
+            max-width: 500px;
+            height: 280px;
+            display: block;
+            margin: 0 auto 20px;
+            background-color: #000;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .password-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .verify-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #9900ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .verify-btn:hover {
+            background-color: #7a00cc;
+        }
+        .get-password-link {
+            display: block;
+            text-align: center;
+            color: #9900ff;
+            text-decoration: underline;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .cos-preview-link {
+            display: block;
+            text-align: center;
+            color: #9900ff;
+            text-decoration: underline;
+            font-size: 15px;
+            margin-top: 15px;
+        }
+        .tip-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .video-tip {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video class="top-video" controls autoplay playsinline>
+            <source src="https://img.naixiai.cn/2025/11/19/interpolation_20250903224047076.mp4" type="video/mp4">
+            您的浏览器不支持视频播放，请更换浏览器重试
+        </video>
+        <div class="video-tip">✅ 全屏功能正常，点击视频右下角「全屏」图标即可放大</div>
+
+        <div class="password-section">
+            <div class="tip-text">输入密码查看内容</div>
+            <input type="password" class="password-input" id="passwordInput" placeholder="请输入密码">
+            <button class="verify-btn" onclick="verifyPassword()">验证密码</button>
+            <a href="https://www.zsgeek.cn/#/creation/1983" target="_blank" class="get-password-link">点我获取密码</a>
+            <!-- 已替换为最新文字超链接目标 -->
+            <a href="https://coss.yupoo.com/upchat/2025-12-01/1764531502978.html" target="_blank" class="cos-preview-link">在线观看cos写真作品，点我预览</a>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = "zxc123";
+        const TARGET_LINK = "https://www.pandadiu.com/html/mcm/";
+
+        function verifyPassword() {
+            const inputPassword = document.getElementById("passwordInput").value;
+            if (inputPassword === CORRECT_PASSWORD) {
+                window.open(TARGET_LINK, "_blank");
+            } else {
+                alert("密码错误，请重新输入！");
+            }
+        }
+    </script>
