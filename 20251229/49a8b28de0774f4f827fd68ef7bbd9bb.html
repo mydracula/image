@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛高次元</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background:#f8f8f8; color:#000; padding:70px 15px 70px; line-height:1.5; }
+        .header { position:fixed; top:0; left:0; right:0; background:#fff; border-bottom:1px solid #eee; padding:12px 20px; z-index:999; height:70px; }
+        .header h1 { font-size:18px; font-weight:600; text-align:center; margin-bottom:8px; }
+        .search-box { width:100%; display:flex; gap:8px; }
+        .search-input { flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
+        .search-btn { 
+            padding:8px 16px; 
+            background:#000; 
+            color:#fff; 
+            border:none; 
+            border-radius:6px; 
+            font-size:14px; 
+            cursor:pointer; 
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .container { width:100%; }
+        .card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:18px; margin-bottom:15px; }
+        .card-title { font-size:16px; font-weight:600; margin-bottom:15px; }
+        .tag-group { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
+        .tag { padding:6px 12px; background:#fafafa; border:1px solid #ddd; border-radius:6px; font-size:14px; cursor:pointer; }
+        .tag.active { background:#000; color:#fff; border-color:#000; }
+        .resource-list { display:flex; flex-direction:column; gap:10px; }
+        .resource-card { padding:12px; background:#fafafa; border:1px solid #eee; border-radius:6px; }
+        .resource-card a { text-decoration:none; color:#000; display:block; }
+    </style>
+    <style>
+        .resource-title { font-size:15px; margin-bottom:5px; }
+        .resource-meta { font-size:12px; color:#666; }
+        .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #eee; display:flex; justify-content:space-around; padding:10px 0; z-index:999; }
+        .nav-item { display:flex; flex-direction:column; align-items:center; font-size:12px; cursor:pointer; }
+        .nav-item i { font-size:20px; margin-bottom:3px; }
+        .nav-item.active { font-weight:600; }
+        .hidden { display:none; }
+        /* 修复页面下沉：确保固定导航不遮挡内容 */
+        .page { width:100%; }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header" id="main-header">
+        <h1>赛高次元</h1>
+        <div class="search-box" id="search-container">
+            <input type="text" class="search-input" id="home-search" placeholder="搜索关键词...">
+            <button class="search-btn" id="search-btn">🔍</button>
+        </div>
+    </header>
+    <div class="container">
+        <div id="home" class="page">
+            <div class="card">
+                <div class="card-title">资源分类</div>
+                <div class="tag-group" id="home-tags"></div>
+                <div style="text-align:center; padding:10px 0; font-size:14px; color:#666;">点击分类或搜索查看资源</div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="discover" class="page hidden">
+            <div class="card">
+                <div class="card-title">资源列表</div>
+                <div class="tag-group" id="discover-tags"></div>
+                <div class="resource-list" id="discover-resources">
+                    <!-- 隐藏关键词超链接 -->
+                    <div class="resource-card" style="margin-top:10px; text-align:center;">
+                        <a href="https://qm.qq.com/q/trz8RumE5q" target="_blank" style="color:#666; text-decoration:underline;">隐藏关键词</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-page="home"><i class="fa fa-home"></i><span>首页</span></div>
+        <div class="nav-item" data-page="discover"><i class="fa fa-compass"></i><span>发现</span></div>
+    </nav>
+    <script>
+        // 1. 初始化分类数据
+        localStorage.dimCats=JSON.stringify([
+            {id:1,name:"cosplay合集"},{id:2,name:"动漫资源"},{id:3,name:"影视大全"},{id:4,name:"次元图片"}
+        ]);
+        // 2. 初始化所有资源（45条：13cos+19次元图+13影视隐藏资源）
+        const allResources=[
+            // cosplay合集（13条）
+            {id:20,keyword:"玉汇",title:"cos-玉汇",link:"https://pan.baidu.com/s/1H7EVO3-AX7QnUYFnW5EkGQ?pwd=5vk1",categoryId:1},
+            {id:21,keyword:"曲奇",title:"cos-曲奇",link:"https://pan.baidu.com/s/1V8_GIzMxJDRhZU9E33ZYHg?pwd=4n88",categoryId:1},
+            {id:22,keyword:"迷之呆梨",title:"cos-迷之呆梨",link:"https://pan.baidu.com/s/1wv6I7lYo712jEa1NJbOV1A?pwd=p2im",categoryId:1},
+            {id:23,keyword:"文字",title:"cos-文字",link:"https://pan.baidu.com/s/19Pdz8uY2-VFEUTwKOODulg?pwd=4nrq",categoryId:1},
+            {id:24,keyword:"神沢永莉",title:"cos-神沢永莉",link:"https://pan.baidu.com/s/1usuVRbY7bRvXC-js0p6mIg?pwd=nrg3",categoryId:1}
+        ];
+    </script>
+<script>
+        // 补充cosplay合集资源
+        allResources.push(
+            {id:25,keyword:"三度69",title:"cos-三度69",link:"https://pan.baidu.com/s/1gombvBI1kaVJ58UrO9mQkg?pwd=ko4p",categoryId:1},
+            {id:26,keyword:"琳铛",title:"cos-琳铛",link:"https://pan.baidu.com/s/1Ygfyt7TF-qNOCrf252T_8w?pwd=b51u",categoryId:1},
+            {id:27,keyword:"脸红",title:"cos-脸红",link:"https://pan.baidu.com/s/1jdudepsQY1b8lSJolq_O-A?pwd=j5s5",categoryId:1},
+            {id:28,keyword:"妖孽",title:"cos-妖孽",link:"https://pan.baidu.com/s/1U2A1iGCZ6v1OBXC9wQrOPw?pwd=v7z9",categoryId:1},
+            {id:29,keyword:"阿包也是兔娘",title:"cos-阿包也是兔娘",link:"https://pan.baidu.com/s/1mYWKWdopZF5wHD16aH9tWg?pwd=4231",categoryId:1},
+            {id:30,keyword:"宝儿茹",title:"cos-宝儿茹",link:"https://pan.baidu.com/s/104ftEhZs12qHSGs-OI0l3w?pwd=x9pt",categoryId:1},
+            {id:31,keyword:"葱油饼",title:"cos-葱油饼",link:"https://pan.baidu.com/s/1NydKGnUlsCSqjPEcch76Mg?pwd=06vp",categoryId:1},
+            {id:32,keyword:"疯猫",title:"cos-疯猫",link:"https://pan.baidu.com/s/1jG7LelFfhBJ0SYW-oEmWwg?pwd=50o3",categoryId:1},
+            // 次元图片（19条）
+            {id:1,keyword:"001",title:"次元图-001",link:"https://drive.uc.cn/s/30c2b456b6564?public=1",categoryId:4},
+            {id:2,keyword:"002",title:"次元图-002",link:"https://drive.uc.cn/s/a715ef1d52f54?public=1",categoryId:4},
+            {id:3,keyword:"003",title:"次元图-003",link:"https://drive.uc.cn/s/f16e83c0f4194?public=1",categoryId:4},
+            {id:4,keyword:"004",title:"次元图-004",link:"https://drive.uc.cn/s/b6034f2fed824?public=1",categoryId:4},
+            {id:5,keyword:"005",title:"次元图-005",link:"https://drive.uc.cn/s/9fb634208b404?public=1",categoryId:4}
+        );
+    </script>
+<script>
+        // 补充次元图片资源
+        allResources.push(
+            {id:6,keyword:"006",title:"次元图-006",link:"https://drive.uc.cn/s/d26cc28bb83b4?public=1",categoryId:4},
+            {id:7,keyword:"007",title:"次元图-007",link:"https://drive.uc.cn/s/ed84573def424?public=1",categoryId:4},
+            {id:8,keyword:"008",title:"次元图-008",link:"https://drive.uc.cn/s/4d57bacde6b84?public=1",categoryId:4},
+            {id:9,keyword:"009",title:"次元图-009",link:"https://drive.uc.cn/s/f6edbfea37254?public=1",categoryId:4},
+            {id:10,keyword:"010",title:"次元图-010",link:"https://drive.uc.cn/s/45da320916ff4?public=1",categoryId:4},
+            {id:11,keyword:"011",title:"次元图-011",link:"https://drive.uc.cn/s/a8bb753994c34?public=1",categoryId:4},
+            {id:12,keyword:"012",title:"次元图-012",link:"https://drive.uc.cn/s/69476ca9e8f24?public=1",categoryId:4},
+            {id:13,keyword:"013",title:"次元图-013",link:"https://drive.uc.cn/s/69476ca9e8f24?public=1",categoryId:4},
+            {id:14,keyword:"014",title:"次元图-014",link:"https://drive.uc.cn/s/75d2607409504?public=1",categoryId:4},
+            {id:15,keyword:"015",title:"次元图-015",link:"https://drive.uc.cn/s/92d1d52438ab4?public=1",categoryId:4},
+            {id:16,keyword:"016",title:"次元图-016",link:"https://drive.uc.cn/s/145ee3330dfe4?public=1",categoryId:4},
+            {id:17,keyword:"017",title:"次元图-017",link:"https://drive.uc.cn/s/240148c65f974?public=1",categoryId:4},
+            {id:18,keyword:"018",title:"次元图-018",link:"https://drive.uc.cn/s/6e601ad735be4?public=1",categoryId:4},
+            {id:19,keyword:"019",title:"次元图-019",link:"https://drive.uc.cn/s/887d5cdd06a24?public=1",categoryId:4}
+        );
+    </script>
+<script>
+        // 补充影视大全隐藏资源（13条，仅搜索可见）
+        allResources.push(
+            {id:33,keyword:"空姐",title:"视频-空姐",link:"https://pan.quark.cn/s/54b8ae8feb51",categoryId:3, isHidden:true},
+            {id:34,keyword:"杨凯莉",title:"视频-杨凯莉",link:"https://pan.quark.cn/s/193c740af624",categoryId:3, isHidden:true},
+            {id:35,keyword:"蛋壳",title:"视频-蛋壳",link:"https://pan.quark.cn/s/b12e6a1e0d83",categoryId:3, isHidden:true},
+            {id:36,keyword:"纹身",title:"视频-纹身",link:"https://pan.quark.cn/s/d101bdbaf683",categoryId:3, isHidden:true},
+            {id:37,keyword:"乃大",title:"视频-乃大",link:"https://pan.quark.cn/s/1e4e438adc29",categoryId:3, isHidden:true},
+            {id:38,keyword:"舞蹈",title:"视频-舞蹈",link:"https://pan.quark.cn/s/84757fbce3e7",categoryId:3, isHidden:true},
+            {id:39,keyword:"颜值",title:"视频-颜值",link:"https://pan.quark.cn/s/44a0b8b42050",categoryId:3, isHidden:true},
+            {id:40,keyword:"早已",title:"视频-早已",link:"https://pan.quark.cn/s/8d32c13ae32c",categoryId:3, isHidden:true},
+            {id:41,keyword:"公大",title:"视频-公大",link:"https://pan.quark.cn/s/0ef0c9729dba",categoryId:3, isHidden:true},
+            {id:42,keyword:"白衣",title:"视频-白衣",link:"https://pan.quark.cn/s/91e425d00fcd",categoryId:3, isHidden:true},
+            {id:43,keyword:"可爱",title:"视频-可爱",link:"https://pan.quark.cn/s/80f3ce49d7ed",categoryId:3, isHidden:true},
+            {id:44,keyword:"漂亮",title:"视频-漂亮",link:"https://pan.quark.cn/s/34c497eeb7f4",categoryId:3, isHidden:true},
+            {id:45,keyword:"黄毛",title:"视频-黄毛",link:"https://pan.quark.cn/s/3394f0554775",categoryId:3, isHidden:true}
+        );
+        // 存储资源到本地存储
+        localStorage.dimRes=JSON.stringify(allResources);
+        // 工具函数：获取分类和资源
+        const getCats=()=>JSON.parse(localStorage.dimCats)||[];
+        const getRes=()=>JSON.parse(localStorage.dimRes)||[];
+    </script>
+<script>
+        // 3. 渲染首页分类标签
+        function renderHomeTags(){
+            const cats=getCats();
+            const container=document.getElementById('home-tags');
+            container.innerHTML='';
+            // 全部资源标签
+            const allTag=document.createElement('div');
+            allTag.className='tag active';
+            allTag.textContent='全部资源';
+            allTag.addEventListener('click',()=>{
+                switchToDiscover();
+                renderDiscoverRes(0);
+            });
+            container.appendChild(allTag);
+            // 各分类标签
+            cats.forEach(cat=>{
+                const tag=document.createElement('div');
+                tag.className='tag';
+                tag.textContent=cat.name;
+                tag.dataset.id=cat.id;
+                tag.addEventListener('click',()=>{
+                    switchToDiscover();
+                    renderDiscoverRes(cat.id);
+                    // 同步发现页标签激活状态
+                    document.querySelectorAll('#discover-tags .tag').forEach(t=>t.classList.remove('active'));
+                    document.querySelector(`#discover-tags .tag[data-id="${cat.id}"]`).classList.add('active');
+                });
+                container.appendChild(tag);
+            });
+        }
+        // 4. 渲染发现页分类标签
+        function renderDiscoverTags(){
+            const cats=getCats();
+            const container=document.getElementById('discover-tags');
+            container.innerHTML='';
+            // 全部资源标签
+            const allTag=document.createElement('div');
+            allTag.className='tag active';
+            allTag.textContent='全部资源';
+            allTag.dataset.id='0';
+            allTag.addEventListener('click',()=>{
+                renderDiscoverRes(0);
+                document.querySelectorAll('#discover-tags .tag').forEach(t=>t.classList.remove('active'));
+                allTag.classList.add('active');
+            });
+            container.appendChild(allTag);
+            // 各分类标签
+            cats.forEach(cat=>{
+                const tag=document.createElement('div');
+                tag.className='tag';
+                tag.textContent=cat.name;
+                tag.dataset.id=cat.id;
+                tag.addEventListener('click',()=>{
+                    renderDiscoverRes(cat.id);
+                    document.querySelectorAll('#discover-tags .tag').forEach(t=>t.classList.remove('active'));
+                    tag.classList.add('active');
+                });
+                container.appendChild(tag);
+            });
+        }
+    </script>
+<script>
+        // 5. 切换到发现页
+        function switchToDiscover(){
+            document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+            document.getElementById('discover').classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            document.querySelector('[data-page="discover"]').classList.add('active');
+            // 确保发现页标签已渲染
+            if(!document.getElementById('discover-tags').firstChild){
+                renderDiscoverTags();
+            }
+        }
+        // 6. 渲染发现页资源列表（核心修复：解决下沉和隐藏逻辑）
+        function renderDiscoverRes(catId=0){
+            const res=getRes();
+            const container=document.getElementById('discover-resources');
+            container.innerHTML='';
+            // 先添加隐藏关键词超链接
+            const hiddenLink=document.createElement('div');
+            hiddenLink.className='resource-card';
+            hiddenLink.style.marginTop='10px';
+            hiddenLink.style.textAlign='center';
+            hiddenLink.innerHTML=`<a href="https://qm.qq.com/q/trz8RumE5q" target="_blank" style="color:#666; text-decoration:underline;">隐藏关键词</a>`;
+            container.appendChild(hiddenLink);
+            // 筛选资源：排除影视大全隐藏资源（仅搜索可见）
+            const filtered=catId?
+                res.filter(r=>r.categoryId===catId && !(r.categoryId===3 && r.isHidden)):
+                res.filter(r=>!(r.categoryId===3 && r.isHidden));
+            // 无资源提示
+            if(filtered.length===0){
+                const noResult=document.createElement('div');
+                noResult.style.textAlign='center';
+                noResult.style.padding='20px 0';
+                noResult.style.color='#666';
+                noResult.textContent='该分类暂无资源~';
+                container.appendChild(noResult);
+                return;
+            }
+            // 渲染资源卡片
+            filtered.forEach(item=>{
+                const card=document.createElement('div');
+                card.className='resource-card';
+                const catName=getCats().find(c=>c.id===item.categoryId)?.name||'未知分类';
+                card.innerHTML=`<a href="${item.link}" target="_blank"><div class="resource-title">${item.title}</div><div class="resource-meta">关键词：${item.keyword} | 分类：${catName}</div></a>`;
+                container.appendChild(card);
+            });
+        }
+    </script>
+<script>
+        // 7. 搜索功能（核心修复：仅关键词精准匹配，含隐藏资源）
+        function doSearch(){
+            const keyword=document.getElementById('home-search').value.trim();
+            if(!keyword){
+                alert('请输入关键词后再搜索！');
+                return;
+            }
+            // 精准匹配关键词（忽略大小写）
+            const res=getRes().filter(r=>
+                r.keyword.toLowerCase()===keyword.toLowerCase()
+            );
+            // 切换到发现页并渲染结果
+            switchToDiscover();
+            const container=document.getElementById('discover-resources');
+            container.innerHTML='';
+            // 添加隐藏关键词超链接
+            const hiddenLink=document.createElement('div');
+            hiddenLink.className='resource-card';
+            hiddenLink.style.marginTop='10px';
+            hiddenLink.style.textAlign='center';
+            hiddenLink.innerHTML=`<a href="https://qm.qq.com/q/trz8RumE5q" target="_blank" style="color:#666; text-decoration:underline;">隐藏关键词</a>`;
+            container.appendChild(hiddenLink);
+            // 无结果提示
+            if(res.length===0){
+                const noResult=document.createElement('div');
+                noResult.style.textAlign='center';
+                noResult.style.padding='20px 0';
+                noResult.style.color='#666';
+                noResult.textContent='未找到匹配资源，请更换关键词重试~';
+                container.appendChild(noResult);
+                return;
+            }
+            // 渲染搜索结果
+            res.forEach(item=>{
+                const card=document.createElement('div');
+                card.className='resource-card';
+                const catName=getCats().find(c=>c.id===item.categoryId)?.name||'未知分类';
+                card.innerHTML=`<a href="${item.link}" target="_blank"><div class="resource-title">${item.title}</div><div class="resource-meta">关键词：${item.keyword} | 分类：${catName}</div></a>`;
+                container.appendChild(card);
+            });
+        }
+        // 绑定搜索事件
+        document.getElementById('search-btn').addEventListener('click',doSearch);
+        document.getElementById('home-search').addEventListener('keydown',(e)=>{
+            if(e.key==='Enter')doSearch();
+        });
+    </script>
+<script>
+        // 8. 页面初始化
+        window.onload=function(){
+            // 渲染首页分类
+            renderHomeTags();
+            // 初始化发现页标签（避免切换时延迟）
+            renderDiscoverTags();
+            // 修复页面加载时的布局偏移
+            document.body.style.paddingTop='70px';
+            document.body.style.paddingBottom='70px';
+        };
+        // 额外优化：点击导航切换页面
+        document.querySelectorAll('.nav-item').forEach(item=>{
+            item.addEventListener('click',function(){
+                const page=this.dataset.page;
+                document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+                document.getElementById(page).classList.remove('hidden');
+                document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+                this.classList.add('active');
+                // 切换到发现页时渲染全部资源
+                if(page==='discover'){
+                    renderDiscoverRes(0);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
