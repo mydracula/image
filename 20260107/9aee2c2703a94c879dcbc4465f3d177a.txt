@@ -1,0 +1,7 @@
+import matplotlib
+matplotlib.use("Qt5Agg")  # 切换为Qt5后端
+
+
+
+二维码生成器
+chatgpt生成证件照
