@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 引入图标库 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    :root {
+        --tg-gold: #FFC107;
+        --tg-gold-grad: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+        --tg-card-bg: #252525;
+        --tg-bg: #121212;
+    }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--tg-bg); color: #fff; }
+    
+    .tg-page {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* 顶部大卡片 */
+    .tg-header-card {
+        background: var(--tg-gold-grad);
+        border-radius: 16px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(255, 152, 0, 0.2);
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+    }
+    .tg-header-card::after {
+        content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;
+    }
+    .tg-rate-num { font-size: 56px; font-weight: 800; color: #000; line-height: 1; }
+    .tg-rate-label { font-size: 16px; color: #333; font-weight: 600; letter-spacing: 1px; margin-top: 5px; }
+    .tg-badge { background: #000; color: var(--tg-gold); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+
+    /* 钩子：回本进度 */
+    .tg-progress-box {
+        background: var(--tg-card-bg);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: 1px solid #333;
+    }
+    .tg-prog-title { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+    .tg-prog-bar-bg { height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
+    .tg-prog-bar-fill { height: 100%; width: 33%; background: var(--tg-gold-grad); border-radius: 5px; }
+    .tg-prog-desc { font-size: 12px; color: #888; margin-top: 10px; }
+    .tg-prog-highlight { color: var(--tg-gold); font-weight: bold; }
+
+    /* 收益演示卡片 */
+    .tg-calc-box {
+        background: #1E1E1E;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--tg-gold);
+    }
+    .tg-calc-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed #333;
+        font-size: 13px;
+    }
+    .tg-calc-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .tg-money { color: var(--tg-gold); font-weight: bold; font-size: 15px; }
+    .tg-total-highlight {
+        margin-top: 15px;
+        text-align: center;
+        padding: 10px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    /* 步骤流程 */
+    .tg-steps { margin-bottom: 30px; }
+    .tg-step-item { display: flex; margin-bottom: 20px; }
+    .tg-step-num {
+        width: 28px; height: 28px;
+        background: var(--tg-gold); color: #000;
+        border-radius: 50%;
+        text-align: center; line-height: 28px;
+        font-weight: bold;
+        margin-right: 15px;
+        flex-shrink: 0;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+    }
+    .tg-step-content h4 { margin: 0 0 5px; font-size: 15px; color: #eee; }
+    .tg-step-content p { margin: 0; font-size: 13px; color: #888; line-height: 1.4; }
+
+    /* 底部按钮 */
+    .tg-footer { margin-top: 30px; text-align: center; }
+    .tg-btn-main {
+        display: block;
+        background: var(--tg-gold-grad);
+        color: #000;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 16px;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 5px 20px rgba(255, 193, 7, 0.3);
+        transition: transform 0.2s;
+    }
+    .tg-btn-main:active { transform: scale(0.98); }
+
+    /* 标题统一样式 */
+    .section-title { font-size: 16px; margin: 0 0 15px 5px; color: #ccc; border-left: 3px solid var(--tg-gold); padding-left: 10px; }
+
+</style>
+</head>
+<body>
+
+<div class="tg-page">
+
+    <!-- 顶部大卡片 -->
+    <div class="tg-header-card">
+        <div class="tg-badge">🚀 TG合伙人计划</div>
+        <div class="tg-rate-num">30%</div>
+        <div class="tg-rate-label">全站顶格佣金</div>
+        <div style="font-size:12px; color:#333; margin-top:10px; opacity:0.8;">阅读 · 视频 · 会员 · 商品 · 全覆盖</div>
+    </div>
+
+    <!-- 钩子：回本进度 -->
+    <div class="tg-progress-box">
+        <div class="tg-prog-title">
+            <span style="color:#ccc;">🎯 回本目标</span>
+            <span style="color:var(--tg-gold);">只需 3 单</span>
+        </div>
+        <div class="tg-prog-bar-bg">
+            <div class="tg-prog-bar-fill"></div>
+        </div>
+        <div class="tg-prog-desc">
+            推广 3 个终身会员，会员费直接赚回。<br>
+            <span class="tg-prog-highlight">第 4 单开始，全是纯利润！</span>
+        </div>
+    </div>
+
+    <!-- 收益演示 -->
+    <h3 class="section-title">💰 收益演示 (钱是怎么来的)</h3>
+    <div class="tg-calc-box">
+        <div class="tg-calc-row">
+            <span>朋友花 <strong>9.9元</strong> 看个视频</span>
+            <span class="tg-money">➔ 你赚 3元</span>
+        </div>
+        <div class="tg-calc-row">
+            <span>朋友花 <strong>198元</strong> 开通会员</span>
+            <span class="tg-money">➔ 你赚 60元</span>
+        </div>
+        <div class="tg-calc-row">
+            <span>朋友花 <strong>298元</strong> 买个礼包</span>
+            <span class="tg-money">➔ 你赚 90元</span>
+        </div>
+        
+        <!-- 这里是你要求的汇总总结 -->
+        <div class="tg-total-highlight">
+            <p style="color:#D4AF37; font-weight:bold; margin:0; font-size:14px; line-height:1.6;">
+                每天只需推 1 个礼包 + 1 个会员<br>
+                <span style="font-size:18px;">月入轻松破 4500+ 元！</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- 操作步骤 -->
+    <h3 class="section-title">🛠 如何开始赚钱？</h3>
+    <div class="tg-steps">
+        <div class="tg-step-item">
+            <div class="tg-step-num">1</div>
+            <div class="tg-step-content">
+                <h4>开通合伙人权限</h4>
+                <p>购买【终身合伙人】会员，系统立即自动激活30%高佣金权限。</p>
+            </div>
+        </div>
+
+        <div class="tg-step-item">
+            <div class="tg-step-num">2</div>
+            <div class="tg-step-content">
+                <h4>获取推广海报</h4>
+                <p>进入用户中心 -> 推广中心，一键生成带你专属二维码的海报。</p>
+            </div>
+        </div>
+
+        <div class="tg-step-item">
+            <div class="tg-step-num">3</div>
+            <div class="tg-step-content">
+                <h4>发朋友圈/群</h4>
+                <p>将海报发到微信群或朋友圈，文案我们都准备好了，直接复制。</p>
+            </div>
+        </div>
+
+        <div class="tg-step-item">
+            <div class="tg-step-num">4</div>
+            <div class="tg-step-content">
+                <h4>躺赚佣金</h4>
+                <p>有人扫码下单，佣金秒到账，满10元即可提现到微信/支付宝。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="tg-footer">
+        <a href="/user/affiliate" class="tg-btn-main">立即加入 · 开启躺赚</a>
+        <p style="font-size:12px; color:#555; margin-top:15px;">加入门槛：开通【终身合伙人】自动激活</p>
+    </div>
+
+</div>
+
+</body>
+</html>
