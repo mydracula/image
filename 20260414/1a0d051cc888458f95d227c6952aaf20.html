@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>甜玉米人设测试🌽</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#f7ffe6;
+    color:#333;
+    margin:0;
+    padding:15px;
+    line-height:1.6;
+  }
+  .page{
+    max-width:700px;
+    margin:0 auto;
+  }
+  .header{
+    text-align:center;
+    padding:20px 0;
+    margin-bottom:20px;
+  }
+  .header h1{
+    color:#5cb14d;
+    font-size:26px;
+    margin:0;
+  }
+  .header p{
+    color:#88a867;
+    font-size:16px;
+    margin-top:6px;
+  }
+  .question{
+    background:#fff;
+    border-radius:18px;
+    padding:18px 20px;
+    margin-bottom:14px;
+    border:1px solid #e6f5cc;
+  }
+  .q-text{
+    font-weight:bold;
+    font-size:15px;
+    margin-bottom:12px;
+    color:#444;
+  }
+  .options{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .opt{
+    flex:1;
+    min-width:120px;
+    background:#fff9cc;
+    border:1px solid #f5e699;
+    border-radius:12px;
+    padding:10px 12px;
+    text-align:center;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.2s;
+  }
+  .opt:hover{
+    background:#f7f0b0;
+  }
+  .opt.active{
+    background:#b7e9a8;
+    border-color:#96d189;
+    color:#1f5f20;
+    font-weight:bold;
+  }
+  .submit-box{
+    text-align:center;
+    margin:40px 0;
+  }
+  #submit-btn{
+    background:#fff066;
+    border:none;
+    border-radius:20px;
+    padding:16px 40px;
+    font-size:18px;
+    font-weight:bold;
+    color:#333;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(255,240,102,0.3);
+    transition:0.3s;
+  }
+  #submit-btn:hover{
+    background:#ffe24d;
+    transform:scale(1.03);
+  }
+  .modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    padding:20px;
+  }
+  .modal.show{
+    display:flex;
+  }
+  .modal-content{
+    background:#fff;
+    border-radius:24px;
+    max-width:650px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:30px;
+    border:2px solid #d9f0b7;
+    position:relative;
+  }
+  .close-modal{
+    position:absolute;
+    top:18px;
+    right:20px;
+    font-size:22px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:#777;
+  }
+  .result-title{
+    text-align:center;
+    color:#5cb14d;
+    font-size:24px;
+    margin-bottom:20px;
+  }
+  .result-section{
+    margin-bottom:20px;
+  }
+  .result-section h3{
+    color:#5cb14d;
+    font-size:18px;
+    margin-bottom:8px;
+  }
+  .result-desc{
+    white-space:pre-wrap;
+    line-height:1.7;
+    color:#333;
+  }
+</style>
+</head>
+
+<body>
+<div class="page">
+  <div class="header">
+    <h1>🌽🌽 甜玉米人设测试 🌽🌽</h1>
+    <p>96题测出你的专属甜玉米人格</p>
+  </div>
+
+  <div id="questions-container"></div>
+
+  <div class="submit-box">
+    <button id="submit-btn">测出我的甜玉米人设🌽</button>
+  </div>
+</div>
+
+<div class="modal" id="result-modal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeModal()">×</button>
+    <div class="result-title" id="result-type"></div>
+    <div class="result-section">
+      <h3>🌽 甜玉米人设</h3>
+      <div class="result-desc" id="result-role"></div>
+    </div>
+    <div class="result-section">
+      <h3>🌽 风格化描述</h3>
+      <div class="result-desc" id="result-desc"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  "看到大家在聊雷朋聊嗨了，我会立刻冲进去加入话题。",
+  "比起在群里叭叭，我更爱安安静静当一只嗑雷朋的甜玉米。",
+  "一遇到同好，我马上就能熟起来，疯狂分享雷朋细节。",
+  "突然被好多人私信聊雷朋，我会有点慌，不知道先回谁。",
+  "一起为雷朋应援的时候，人越热闹我反而越兴奋。",
+  "群里刷雷朋消息太快，我看着看着就想静音躲一躲。",
+  "我超爱组织大家一起搞事，给雷朋排面拉满！",
+  "我更喜欢一个人默默刷雷朋物料、存美图，独自快乐。",
+  "群里因为雷朋吵起来的时候，我会主动出来调节气氛～",
+  "一看到关于雷朋的节奏满天飞，我就想闭嘴潜水不掺和。",
+  "很容易和一起磕雷朋的姐妹，变成天天聊天的搭子。",
+  "我更想保持一点距离，安安静静喜欢雷朋就好。",
+  "有新粉进来，我会主动欢迎、科普雷朋的小细节。",
+  "一到雷朋相关消息爆炸时，我就只想消失一会儿充充电。",
+
+  "我磕雷朋更信实打实的互动，不爱脑补过度。",
+  "我总能从细枝末节里，嗑到别人没发现的雷朋暗糖。",
+  "眼睛看到的雷朋才是真的，太发散的解读我不太吃。",
+  "我超爱挖雷朋的深层氛围感，总觉得背后还有小小心思。",
+  "看雷朋相关画面，我第一眼注意穿搭、动作、真实状态。",
+  "看雷朋相关画面，我先嗑氛围和情绪，感觉对就赢了。",
+  "雷朋的官方物料才是安全感，小道消息我不太敢信。",
+  "雷朋的暗糖和隐秘互动最戳我，越神秘我越上头。",
+  "我习惯按时间线捋雷朋的动态，不喜欢乱加猜测。",
+  "我超会把雷朋的碎片串成故事，越品越有那味儿。",
+  "我更关注雷朋实际做了什么，不玩虚的象征。",
+  "我总爱琢磨雷朋行为背后的隐喻，越想越甜。",
+  "看得见的雷朋互动才好嗑，虚无缥缈的不太吃。",
+  "雷朋的氛围感就是王道，有些甜不用明说也懂。",
+
+  "遇到关于雷朋的争议，我会先捋逻辑，再表达看法。",
+  "遇到关于雷朋的争议，我会先顾大家情绪，不想吵得难看。",
+  "我更看重说得对不对，不是听着好不好听，尤其对雷朋。",
+  "聊雷朋时我说话会软软的，怕一不小心伤到同好姐妹。",
+  "就算是我爱的雷朋，不合理的地方我也会直说。",
+  "磕雷朋开心最重要，没必要太较真破坏气氛。",
+  "有人带雷朋节奏，我会先分析对方什么目的、逻辑通不通。",
+  "有人带雷朋节奏，我第一反应：这人也太没礼貌了吧！",
+  "聊雷朋我比较不容易被情绪带跑，更信事实。",
+  "我很容易被雷朋相关氛围感染，跟着一起开心或委屈。",
+  "对雷朋的评价，我更看重客观不双标。",
+  "一看到有人说雷朋不好，我当场就会难过。",
+  "我做和雷朋相关的选择时，更在意公不公平、合不合理。",
+  "我做和雷朋相关的选择时，更在意大家开不开心、舒不舒服。",
+
+  "为雷朋打榜/应援，我喜欢提前规划好节奏。",
+  "追雷朋我比较随性，想起来就做，不喜欢被安排。",
+  "我的雷朋物料整整齐齐，分类归档超清楚。",
+  "雷朋相关物料随手存，乱就乱点，找得到就行～",
+  "雷朋相关任务一出来我会尽快做完，不爱拖到最后。",
+  "追雷朋我日常：不急，最后一刻再极限操作。",
+  "为雷朋做事我喜欢一步一步来，稳稳当当最安心。",
+  "追雷朋想到什么做什么，自由一点才快乐。",
+  "雷朋的应援计划被打乱时，我会有点烦躁想重新安排。",
+  "追雷朋计划乱了就乱了，换个姿势继续嗑就好。",
+  "关于雷朋的事定下来我才踏实，最受不了悬而未决。",
+  "追雷朋不急着决定，等一等灵感和心情也不错。",
+  "我为雷朋做事有条理，乱糟糟会让我有点难受。",
+  "追雷朋乱一点也没关系，甜玉米开心最重要。",
+
+  "我会主动整理雷朋时间线，给新粉当说明书。",
+  "我更喜欢看别人整理好的雷朋内容，自己懒得动手。",
+  "看到乱编踩雷朋的，我会忍不住上去纠正。",
+  "看到乱带雷朋节奏的，我直接划走，眼不见为净。",
+  "我超爱深度分析雷朋，写小作文解读各种小细节。",
+  "我就想轻松磕雷朋，不想搞得太累太深。",
+  "我会默默存图存视频，把雷朋物料好好备份。",
+  "看到雷朋好看的就存，不会刻意分类整理。",
+  "我很在意别人评价雷朋，到底客不客观。",
+  "别人怎么说雷朋无所谓，我自己喜欢就够了。",
+  "有人不懂雷朋，我会主动解释，帮大家澄清。",
+  "别人聊雷朋我不太想管，自己安静嗑就好。",
+  "我磕雷朋很看重逻辑通不通，自洽才好嗑。",
+  "我磕雷朋只看感觉对不对，感觉对就完事。",
+  "我会提前想好怎么维护雷朋，反黑控评有节奏。",
+  "一遇到雷朋相关争执我就想跑，保命要紧不掺和。",
+  "聊雷朋我喜欢把话说清楚，不喜欢含糊不清。",
+  "有些关于雷朋的事不用太明白，糊涂一点更快乐。",
+  "雷朋的数据、榜单、任务进度我都盯得很紧。",
+  "数据不关我事，我只安安静静喜欢雷朋就够。",
+  "我喜欢和大家一起讨论雷朋，交换不同观点。",
+  "我更喜欢自己一个人慢慢品雷朋，慢慢嗑。",
+  "聊雷朋我说话比较直，有啥说啥不绕弯。",
+  "聊雷朋我说话会委婉一点，照顾大家的小情绪。",
+  "我对雷朋的判断，不会轻易被别人带跑。",
+  "我很容易被大家聊雷朋的气氛带着一起走。",
+  "我喜欢雷朋的应援搞得有秩序、有流程、有排面。",
+  "追雷朋我喜欢怎么开心怎么来，自由最重要。",
+  "雷朋的很多细节我都记得，方便以后澄清用。",
+  "雷朋的细节记不住，我只记得整体甜不甜。",
+  "一有雷朋相关矛盾，我会先冷静下来再说话。",
+  "一有雷朋相关矛盾，我会先共情安抚再沟通。",
+  "我喜欢把雷朋的信息整理得清晰又好懂。",
+  "聊雷朋我喜欢自由表达，不用那么规整。",
+  "我会主动维护圈子，别让节奏乱踩雷朋。",
+  "我就想佛系躺平，安安静静喜欢雷朋。",
+  "聊雷朋我看重事实，不爱情绪化发言。",
+  "聊雷朋我很容易被打动，一上头就心软。",
+  "我习惯按计划完成每天为雷朋做的小任务。",
+  "追雷朋我习惯跟着心情走，想做再做不勉强。",
+];
+
+const dimensionMap = [
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+  0,1,2,3,1,2,3,1,2,3,2,3,1,2,
+  3,1,2,3,1,2,3,0,2,3,0,2,1,3,
+  1,2,0,3,2,3,1,2,0,3
+];
+
+const direction = [
+  1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  1,0,1,0,1,0,1,1,0,1,1,0,1,0,
+  1,0,1,0,1,0,1,1,0,1
+];
+
+const types = [
+  {
+    name:"指挥官甜玉米🌽",
+    role:"气场两米八的「大当家」，能控住整个玉米地的节奏",
+    desc:"你是玉米地天生的主心骨，自带定海神针气场。再乱的节奏到你这儿都能捋顺，再疯的场面你也能稳稳按住。不搞情绪输出，只看逻辑和事实，一开口就是风向，一出手就是秩序，谁看了都得喊一句大佬。"
+  },
+  {
+    name:"辩手甜玉米🌽",
+    role:"嘴炮满级的「杠精乐子人」，用逻辑和梗把黑子怼到哑口无言",
+    desc:"你是玉米地反套路第一人，脑转得比嘴快，梗比套路多。别人带节奏你拆台，别人玩阴阳你直球，主打一个不按常理出牌。吵不赢不存在，只有你不想玩，一身反骨又清醒，快乐怼人两不误。"
+  },
+  {
+    name:"军师甜玉米🌽",
+    role:"沉默的「幕后策划」，心里藏着全玉米地的局",
+    desc:"你是藏在暗处的操盘手，表面安静如水，心里早把所有走向算完。不轻易露面，不随便发言，一出手必是关键局。冷静、腹黑、看得透，玉米地发生啥都逃不过你的眼睛。"
+  },
+  {
+    name:"学者甜玉米🌽",
+    role:"沉迷细节的「学术派」，用逻辑和证据磕糖",
+    desc:"别人磕糖靠脑补，你磕糖靠论文级分析。时间线、眼神、动作、背景，全给你扒得明明白白，蛛丝马迹一根不落。主打一个严谨磕糖、理性发疯，用实锤把所有谣言按在地上摩擦。"
+  },
+  {
+    name:"教育家甜玉米🌽",
+    role:"温柔的「大家长」，能安抚所有人的情绪",
+    desc:"你是玉米地的温柔定心丸，谁破防了你都能捞回来，谁乱了你都能稳住。不强势、不尖锐，却能用最软的话稳住最乱的场，让人一靠近就觉得安心，是玉米地里最暖的定盘星。"
+  },
+  {
+    name:"追梦甜玉米🌽",
+    role:"热烈的「快乐小狗」，眼里全是糖和光",
+    desc:"你是玉米地行走的快乐发电机，一点糖就能原地起飞，一点互动就能疯到天亮。看啥都甜，磕啥都燃，情绪全写在脸上，快乐自带感染力，有你在，玉米地永远亮堂堂。"
+  },
+  {
+    name:"治愈甜玉米🌽",
+    role:"温柔的「倾听者」，能接住所有情绪",
+    desc:"你是玉米地最会藏心事也最会听心事的人，谁的委屈都敢跟你说，谁的难过你都能接住。不张扬、不抢戏，默默治愈所有人，像一阵软风，轻轻抚平所有烦躁和不安。"
+  },
+  {
+    name:"小蝴蝶甜玉米🌽",
+    role:"软萌但有刺的「理想主义者」，为了心中的纯粹而战",
+    desc:"外表软乎乎，内心硬邦邦，看着好欺负，底线碰不得。为了守护心里那点干净和真心，能爆发出意想不到的勇气。不擅长吵架，却会用最温柔的方式，守住最倔的坚持。"
+  },
+  {
+    name:"管理员甜玉米🌽",
+    role:"铁面无私的「规则守护者」，维护玉米地秩序",
+    desc:"你是玉米地的清道夫，眼里揉不得一点乱。引战就治，带节奏就压，不看人情只守规矩，用强硬守住玉米地的干净。虽然看着凶，却是玉米地最不能缺的安全感。"
+  },
+  {
+    name:"守护者甜玉米🌽",
+    role:"热情的「大家姐」，把所有人照顾得妥妥帖帖",
+    desc:"你是玉米地里的小太阳，新粉有人带，冷场有人救，emo有人哄。细心又周到，热闹又真诚，走到哪暖到哪，谁跟你待在一起都觉得舒服又放心。"
+  },
+  {
+    name:"记录员甜玉米🌽",
+    role:"沉默的「时间线守护者」，把所有糖点都存档",
+    desc:"你是玉米地行走的活档案，所有旧糖、物料、时间线全在你手里。话不多但超靠谱，平时安安静静，一到关键时刻，只有你能掏出最全的实锤。"
+  },
+  {
+    name:"小护士甜玉米🌽",
+    role:"默默付出的「后勤兵」，在暗处支持所有人",
+    desc:"你是玉米地背后的隐形支柱，台前不抢镜，幕后全扛住。修图、整理、做数据、补后勤，别人看不见的地方全是你，低调又靠谱，玉米地没你真不行。"
+  },
+  {
+    name:"玩家甜玉米🌽",
+    role:"敢玩敢闹的「酷盖」，不内耗、只乐呵",
+    desc:"你是玉米地顶级乐子人，主打一个开心至上、及时行乐。糖也磕，瓜也吃，节奏来了不往心里去，怎么快乐怎么来，洒脱又自在，谁也别想让你内耗。"
+  },
+  {
+    name:"表演家甜玉米🌽",
+    role:"爱闹爱秀的「显眼包」，把快乐写在脸上",
+    desc:"你是群聊气氛天花板，爱闹、爱笑、爱刷屏，快乐全写在脸上。磕到糖就疯，吃到瓜就分享，不装不端，直白又可爱，有你在永远不会冷场。"
+  },
+  {
+    name:"手艺人甜玉米🌽",
+    role:"低调的「技术宅」，用技能说话",
+    desc:"话少手巧，技术拉满，修图、剪辑、做图样样能打。平时安安静静，一出手就惊艳全场，用实力默默撑腰，是玉米地最酷的隐形大佬。"
+  },
+  {
+    name:"艺术家甜玉米🌽",
+    role:"温柔的「创作者」，用作品表达热爱",
+    desc:"你把所有热爱都变成画、变成文、变成温柔的小世界。不吵不闹，不慌不忙，用最软的方式表达最深的喜欢，每一帧作品都在说：我真的有在好好爱着。"
+  }
+];
+
+const resultOrder = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+
+const container = document.getElementById("questions-container");
+const answers = Array(questions.length).fill(null);
+const opts = ["完全不符","不太符合","一般","基本符合","完全符合"];
+
+questions.forEach((q, idx) => {
+  const div = document.createElement("div");
+  div.className = "question";
+  div.innerHTML = `<div class="q-text">${idx+1}. ${q}</div><div class="options"></div>`;
+  const optWrap = div.querySelector(".options");
+
+  opts.forEach((txt, s) => {
+    const b = document.createElement("div");
+    b.className = "opt";
+    b.textContent = txt;
+    b.onclick = () => {
+      optWrap.querySelectorAll(".opt").forEach(o => o.classList.remove("active"));
+      b.classList.add("active");
+      answers[idx] = s + 1;
+    };
+    optWrap.appendChild(b);
+  });
+  container.appendChild(div);
+});
+
+document.getElementById("submit-btn").onclick = () => {
+  if (answers.some(v => v == null)) {
+    alert("请完成所有题目再提交哦～");
+    return;
+  }
+
+  let dim1 = 0, dim2 = 0, dim3 = 0, dim4 = 0;
+  answers.forEach((score, i) => {
+    const d = dimensionMap[i];
+    const dir = direction[i];
+    const s = dir ? score : 6 - score;
+
+    if (d === 0) dim1 += s;
+    if (d === 1) dim2 += s;
+    if (d === 2) dim3 += s;
+    if (d === 3) dim4 += s;
+  });
+
+  const r = Math.abs((dim1 * 7 + dim2 * 13 + dim3 * 17 + dim4 * 23) % 16);
+  const res = types[resultOrder[r]];
+
+  document.getElementById("result-type").innerText = res.name;
+  document.getElementById("result-role").innerText = res.role;
+  document.getElementById("result-desc").innerText = res.desc;
+  document.getElementById("result-modal").classList.add("show");
+};
+
+function closeModal(){
+  document.getElementById("result-modal").classList.remove("show");
+}
+</script>
+</body>
+</html>
