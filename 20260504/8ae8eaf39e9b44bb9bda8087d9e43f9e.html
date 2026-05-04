@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>字体缩放器 · 纯UPEM修改</title>
+    <style>
+        *{box-sizing:border-box;}
+        body{
+            font-family:system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background:#eef2f5;
+            margin:0;
+            min-height:100vh;
+            padding:20px 16px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .card{
+            max-width:900px;
+            width:100%;
+            background:#fff;
+            border-radius:32px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.05);
+            overflow:hidden;
+        }
+        .header{
+            background:#1e2f3f;
+            padding:18px 24px;
+            color:white;
+        }
+        .header h1{
+            margin:0 0 4px;
+            font-size:1.5rem;
+            font-weight:600;
+        }
+        .header p{
+            margin:0;
+            opacity:0.8;
+            font-size:0.8rem;
+        }
+        .content{
+            padding:22px 24px;
+        }
+        .info{
+            background:#eef3fc;
+            border-left:4px solid #1e2f3f;
+            padding:10px 14px;
+            border-radius:14px;
+            font-size:0.8rem;
+            margin-bottom:20px;
+        }
+        .upload-area{
+            border:2px dashed #c0d4ea;
+            border-radius:24px;
+            background:#fafdff;
+            padding:24px 20px;
+            text-align:center;
+            cursor:pointer;
+            transition:0.2s;
+            margin-bottom:24px;
+        }
+        .upload-area:hover{border-color:#1e2f3f; background:#f4faff;}
+        .file-label{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:6px;
+            cursor:pointer;
+        }
+        .file-icon{font-size:38px;}
+        .control-panel{
+            background:#f9fbfe;
+            border-radius:24px;
+            padding:18px;
+            border:1px solid #e2e8f0;
+            margin:12px 0;
+        }
+        .scale-row{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            flex-wrap:wrap;
+            margin-bottom:16px;
+        }
+        .scale-row label{font-weight:500; min-width:70px;}
+        input[type="range"]{
+            flex:1;
+            min-width:150px;
+            height:5px;
+            -webkit-appearance:none;
+            background:#ccdae8;
+            border-radius:5px;
+        }
+        input[type="range"]::-webkit-slider-thumb{
+            -webkit-appearance:none;
+            width:18px;
+            height:18px;
+            background:#1e2f3f;
+            border-radius:50%;
+            cursor:pointer;
+        }
+        .scale-value{
+            background:#e8edf3;
+            padding:4px 12px;
+            border-radius:40px;
+            font-weight:600;
+            font-size:0.9rem;
+        }
+        .btn-group{
+            display:flex;
+            gap:12px;
+            margin-top:12px;
+            flex-wrap:wrap;
+        }
+        .btn-primary{
+            background:#1e2f3f;
+            border:none;
+            color:white;
+            padding:8px 28px;
+            border-radius:40px;
+            font-weight:600;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .btn-primary:hover{background:#0e1e2c;}
+        .btn-outline{
+            background:transparent;
+            border:1px solid #1e2f3f;
+            color:#1e2f3f;
+            padding:8px 24px;
+            border-radius:40px;
+            font-weight:500;
+            cursor:pointer;
+        }
+        .status{
+            margin:16px 0;
+            padding:10px 14px;
+            border-radius:18px;
+            font-size:0.8rem;
+            background:#eef2f7;
+        }
+        .preview{
+            margin-top:18px;
+            border-top:1px solid #e2e8f0;
+            padding-top:16px;
+        }
+        .preview-text{
+            background:#f4f8fe;
+            padding:12px;
+            border-radius:18px;
+            font-size:1.2rem;
+            line-height:1.4;
+            word-break:break-word;
+        }
+        .footnote{
+            margin-top:18px;
+            font-size:0.7rem;
+            text-align:center;
+            color:#6f7c8e;
+        }
+        @media (max-width:500px){
+            .content{padding:16px;}
+            .header h1{font-size:1.3rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>📐 字体缩放器</h1>
+        <p>只改UPEM · 字形缩放 · 行距不变</p>
+    </div>
+    <div class="content">
+        <div class="info">⚙️ 原理：仅修改字体的“Units Per EM”基准值，字形轮廓坐标不变，但渲染大小改变。行距/升降部保持原始比例。</div>
+
+        <div class="upload-area" id="dropZone">
+            <label class="file-label">
+                <span class="file-icon">📂</span>
+                <span style="font-weight:500;">点击或拖拽上传字体</span>
+                <span style="font-size:0.7rem; color:#5c6e84;">.ttf 或 .otf</span>
+                <input type="file" id="fontInput" accept=".ttf,.otf" style="display:none;">
+            </label>
+        </div>
+
+        <div id="ctrlPanel" style="display:none;">
+            <div class="control-panel">
+                <div class="scale-row">
+                    <label>🔍 缩放倍数</label>
+                    <input type="range" id="scaleSlider" min="0.5" max="2.5" step="0.01" value="1.0">
+                    <span class="scale-value" id="scaleVal">1.00</span>
+                </div>
+                <div class="btn-group">
+                    <button id="downloadBtn" class="btn-primary">⬇️ 下载缩放字体</button>
+                    <button id="resetBtn" class="btn-outline">重置 1x</button>
+                </div>
+            </div>
+            <div class="preview">
+                <div style="font-weight:500; margin-bottom:6px;">🔤 预览效果</div>
+                <div id="previewBlock" class="preview-text" style="font-family:monospace;">
+                    字体预览 · 中英文混合: Hello 世界 123
+                </div>
+                <div style="font-size:0.7rem; margin-top:6px;">* 动态生成临时字体展示缩放效果（行距不变）</div>
+            </div>
+        </div>
+
+        <div id="statusMsg" class="status">💡 上传 TTF/OTF 字体文件</div>
+        <div class="footnote">只修改head表中的Units Per EM，不触碰hhea/OS2等行距表。安装后相同字号下字体显示改变，行距保持原设计。</div>
+    </div>
+</div>
+
+<script>
+(function(){
+    // DOM
+    const fileInput = document.getElementById('fontInput');
+    const dropZone = document.getElementById('dropZone');
+    const ctrlPanel = document.getElementById('ctrlPanel');
+    const scaleSlider = document.getElementById('scaleSlider');
+    const scaleValSpan = document.getElementById('scaleVal');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusDiv = document.getElementById('statusMsg');
+    const previewBlock = document.getElementById('previewBlock');
+
+    // state
+    let originalBuffer = null;
+    let originalName = "scaled_font";
+    let previewBlobUrl = null;
+    let activeFontFace = null;
+
+    function setStatus(msg, isErr=false){
+        statusDiv.innerHTML = msg;
+        statusDiv.style.backgroundColor = isErr ? '#ffe8e6' : '#eef2f7';
+        statusDiv.style.color = isErr ? '#b33' : '#1e2f3f';
+    }
+
+    function revokePreviewURL(){
+        if(previewBlobUrl){
+            URL.revokeObjectURL(previewBlobUrl);
+            previewBlobUrl = null;
+        }
+    }
+
+    function removeFontFace(){
+        if(activeFontFace){
+            document.fonts.delete(activeFontFace);
+            activeFontFace = null;
+        }
+    }
+
+    // 读取UPEM
+    function readUPEM(buffer){
+        const dv = new DataView(buffer);
+        const version = dv.getUint32(0);
+        if(!(version === 0x74727565 || version === 0x4f54544f || version === 0x00010000)){
+            throw new Error("仅支持 TTF/OTF 格式");
+        }
+        const numTables = dv.getUint16(4);
+        let offset = 12;
+        for(let i=0; i<numTables; i++){
+            const tag = dv.getUint32(offset);
+            const tableOff = dv.getUint32(offset+8);
+            if(tag === 0x68656164){ // 'head'
+                return dv.getUint16(tableOff + 18);
+            }
+            offset += 16;
+        }
+        throw new Error("未找到 head 表");
+    }
+
+    // 提取字体族名
+    function extractFamilyName(buffer){
+        try{
+            const dv = new DataView(buffer);
+            const version = dv.getUint32(0);
+            if(!(version === 0x74727565 || version === 0x4f54544f || version === 0x00010000)) return "font";
+            let numTables = dv.getUint16(4);
+            let nameOff = -1, nameLen = 0;
+            let pos = 12;
+            for(let i=0;i<numTables;i++){
+                const tag = dv.getUint32(pos);
+                if(tag === 0x6e616d65){ // 'name'
+                    nameOff = dv.getUint32(pos+8);
+                    nameLen = dv.getUint32(pos+12);
+                    break;
+                }
+                pos += 16;
+            }
+            if(nameOff === -1) return "resized_font";
+            const view = new DataView(buffer, nameOff, nameLen);
+            const count = view.getUint16(2);
+            const strOff = view.getUint16(4);
+            for(let i=0;i<count;i++){
+                const recOff = 6 + i*12;
+                const nameID = view.getUint16(recOff+6);
+                const lenStr = view.getUint16(recOff+8);
+                const offStr = view.getUint16(recOff+10);
+                if(nameID === 1 || nameID === 16){
+                    const bytes = new Uint8Array(buffer, nameOff + strOff + offStr, lenStr);
+                    const decoder = new TextDecoder('utf-16be');
+                    let nm = decoder.decode(bytes);
+                    if(nm) return nm.replace(/\0/g,'').trim();
+                }
+            }
+        }catch(e){}
+        return "scaled_font";
+    }
+
+    // 核心：只修改UPEM，不动hhea/OS2等任何其他表（行距完全保持不变）
+    function rescaleFontOnlyUPEM(buffer, scale){
+        const newBuf = buffer.slice(0);
+        const dv = new DataView(newBuf);
+        const version = dv.getUint32(0);
+        if(!(version === 0x74727565 || version === 0x4f54544f || version === 0x00010000)){
+            throw new Error("不支持的字体类型");
+        }
+        const numTables = dv.getUint16(4);
+        let headOff = -1;
+        let dirPos = 12;
+        for(let i=0;i<numTables;i++){
+            const tag = dv.getUint32(dirPos);
+            const tableOffset = dv.getUint32(dirPos+8);
+            if(tag === 0x68656164) headOff = tableOffset;
+            dirPos += 16;
+        }
+        if(headOff === -1) throw new Error("缺少head表");
+        
+        const oldUPEM = dv.getUint16(headOff + 18);
+        let newUPEM = Math.round(oldUPEM * scale);
+        newUPEM = Math.min(16384, Math.max(16, newUPEM));
+        
+        // 只改UPEM值和校验和，其他表绝对不动
+        dv.setUint16(headOff + 18, newUPEM);
+        dv.setUint32(headOff + 8, 0);   // 重置校验和，避免字体校验警告
+        
+        return newBuf;
+    }
+
+    // 预览
+    async function updatePreview(buffer, scale){
+        if(!buffer) return false;
+        try{
+            const scaledBuf = rescaleFontOnlyUPEM(buffer, scale);
+            const blob = new Blob([scaledBuf], {type: 'application/x-font-ttf'});
+            revokePreviewURL();
+            const url = URL.createObjectURL(blob);
+            previewBlobUrl = url;
+            removeFontFace();
+            const fontFamily = `preview_${Date.now()}_${Math.floor(scale*100)}`;
+            const fontFace = new FontFace(fontFamily, `url(${url}) format('truetype')`);
+            await fontFace.load();
+            document.fonts.add(fontFace);
+            activeFontFace = fontFace;
+            previewBlock.style.fontFamily = `"${fontFamily}", "Courier New", monospace`;
+            previewBlock.style.fontSize = "22px";
+            return true;
+        }catch(err){
+            console.warn(err);
+            previewBlock.style.fontFamily = "monospace";
+            return false;
+        }
+    }
+
+    // 处理上传
+    async function handleFont(file){
+        if(!file) return;
+        setStatus(`⏳ 读取字体: ${file.name} ...`);
+        try{
+            const buf = await file.arrayBuffer();
+            const upem = readUPEM(buf);
+            originalBuffer = buf.slice(0);
+            originalName = extractFamilyName(buf) || file.name.replace(/\.[^/.]+$/, '') || "modified_font";
+            setStatus(`✅ 字体「${originalName}」 原始UPEM=${upem}。拖动滑块调整缩放倍数（行距不变）。`);
+            ctrlPanel.style.display = "block";
+            scaleSlider.value = "1.0";
+            scaleValSpan.innerText = "1.00";
+            await updatePreview(originalBuffer, 1.0);
+        }catch(err){
+            setStatus(`❌ 失败: ${err.message}`, true);
+            ctrlPanel.style.display = "none";
+            originalBuffer = null;
+            removeFontFace();
+            revokePreviewURL();
+            previewBlock.style.fontFamily = "monospace";
+        }
+    }
+
+    let previewTimer = null;
+    function onScaleChange(){
+        if(!originalBuffer) return;
+        const val = parseFloat(scaleSlider.value);
+        scaleValSpan.innerText = val.toFixed(2);
+        setStatus(`🎚️ 缩放 ${val.toFixed(2)}x，更新预览...`);
+        if(previewTimer) clearTimeout(previewTimer);
+        previewTimer = setTimeout(async () => {
+            const ok = await updatePreview(originalBuffer, val);
+            if(ok) setStatus(`✅ 缩放 ${val.toFixed(2)}x 预览成功，行距保持原始设计`);
+            else setStatus(`⚠️ 预览受限，但下载功能正常`, false);
+        }, 30);
+    }
+
+    function downloadFont(){
+        if(!originalBuffer){
+            setStatus("没有字体文件", true);
+            return;
+        }
+        try{
+            const scale = parseFloat(scaleSlider.value);
+            const scaledBuf = rescaleFontOnlyUPEM(originalBuffer, scale);
+            const blob = new Blob([scaledBuf], {type: 'application/x-font-ttf'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const scaleStr = scale.toFixed(2).replace('.', '_');
+            a.download = `${originalName}_${scaleStr}x.ttf`;
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setStatus(`📁 已下载缩放 ${scale.toFixed(2)}x 的字体文件，安装后生效（行距不变）。`);
+        }catch(err){
+            setStatus(`下载失败: ${err.message}`, true);
+        }
+    }
+
+    function resetScale(){
+        if(!originalBuffer) return;
+        scaleSlider.value = "1.0";
+        onScaleChange();
+    }
+
+    // 事件绑定
+    dropZone.addEventListener('click', ()=> fileInput.click());
+    dropZone.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        dropZone.style.borderColor = "#1e2f3f";
+        dropZone.style.background = "#f4faff";
+    });
+    dropZone.addEventListener('dragleave', ()=>{
+        dropZone.style.borderColor = "#c0d4ea";
+        dropZone.style.background = "#fafdff";
+    });
+    dropZone.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        dropZone.style.borderColor = "#c0d4ea";
+        dropZone.style.background = "#fafdff";
+        const files = e.dataTransfer.files;
+        if(files.length && files[0].name.match(/\.(ttf|otf)$/i)){
+            handleFont(files[0]);
+        }else{
+            setStatus("请拖拽 .ttf 或 .otf 文件", true);
+        }
+    });
+    fileInput.addEventListener('change', (e)=>{
+        if(e.target.files.length) handleFont(e.target.files[0]);
+    });
+    scaleSlider.addEventListener('input', onScaleChange);
+    downloadBtn.addEventListener('click', downloadFont);
+    resetBtn.addEventListener('click', resetScale);
+
+    window.addEventListener('beforeunload', ()=>{
+        revokePreviewURL();
+        removeFontFace();
+    });
+})();
+</script>
+</body>
+</html>
