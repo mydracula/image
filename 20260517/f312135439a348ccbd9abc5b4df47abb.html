@@ -1,0 +1,173 @@
+<html>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MP3 play2</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        background-color: #2196F3;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    h1 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .music-box {
+        margin-bottom: 20px;
+    }
+
+    .file-input {
+        width: 90%;
+        margin-bottom: 10px;
+        color: white;
+    }
+
+    .play-btn {
+        width: 90%;
+        max-width: 350px;
+        height: 60px;
+        border: none;
+        border-radius: 15px;
+        background-color: yellow;
+        font-size: 22px;
+        font-weight: bold;
+        color: black;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .play-btn:active {
+        transform: scale(0.95);
+    }
+
+    .tip {
+        margin-top: 20px;
+        color: white;
+        font-size: 18px;
+    }
+
+    @media (max-width: 600px) {
+        .play-btn {
+            height: 70px;
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<h1>MP3 play2</h1>
+
+<div id="container"></div>
+
+<div class="tip">
+   
+</div>
+
+<script>
+    const container = document.getElementById("container");
+
+    const audios = new Array(6).fill(null);
+    let currentAudio = null;
+
+    // M
+    for (let i = 0; i < 6; i++) {
+
+        const box = document.createElement("div");
+        box.className = "music-box";
+
+        // �n���x��
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".mp3";
+        input.className = "file-input";
+
+        // ���o
+        const btn = document.createElement("button");
+        btn.className = "play-btn";
+        btn.innerText = `M ${i + 1}`;
+
+        // �x�� MP3
+        input.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+
+                audios[i] = new Audio(url);
+                audios[i].loop = false;
+            }
+        });
+
+        // ���Ź���
+        function playMusic(index) {
+
+            if (!audios[index]) {
+                alert("Ո���x�� MP3 ���");
+                return;
+            }
+
+            // ֹͣǰһ��
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentAudio = audios[index];
+
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+        }
+
+        // ���o�c��
+        btn.addEventListener("click", () => {
+            playMusic(i);
+        });
+
+        box.appendChild(input);
+        box.appendChild(btn);
+
+        container.appendChild(box);
+    }
+
+    // �I�P����I 1~6
+    document.addEventListener("keydown", (e) => {
+
+        const key = parseInt(e.key);
+
+        if (key >= 1 && key <= 6) {
+
+            const index = key - 1;
+
+            if (!audios[index]) {
+                alert(`Ո���O����� ${key}`);
+                return;
+            }
+
+            // ֹͣĿǰ����
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentAudio = audios[index];
+
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+        }
+    });
+
+</script>
+
+</body>
+</html>
