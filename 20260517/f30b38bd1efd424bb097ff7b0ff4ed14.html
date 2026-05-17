@@ -1,0 +1,173 @@
+HTML
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MP3 play2</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        background-color: #2196F3;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    h1 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .music-box {
+        margin-bottom: 20px;
+    }
+
+    .file-input {
+        width: 90%;
+        margin-bottom: 10px;
+        color: white;
+    }
+
+    .play-btn {
+        width: 90%;
+        max-width: 350px;
+        height: 60px;
+        border: none;
+        border-radius: 15px;
+        background-color: yellow;
+        font-size: 22px;
+        font-weight: bold;
+        color: black;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .play-btn:active {
+        transform: scale(0.95);
+    }
+
+    .tip {
+        margin-top: 20px;
+        color: white;
+        font-size: 18px;
+    }
+
+    @media (max-width: 600px) {
+        .play-btn {
+            height: 70px;
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<h1>MP3 快捷播放器</h1>
+
+<div id="container"></div>
+
+<div class="tip">
+    快捷鍵：鍵盤 1 ~ 6 播放音樂
+</div>
+
+<script>
+    const container = document.getElementById("container");
+
+    const audios = new Array(6).fill(null);
+    let currentAudio = null;
+
+    // 建立六組播放器
+    for (let i = 0; i < 6; i++) {
+
+        const box = document.createElement("div");
+        box.className = "music-box";
+
+        // 檔案選擇
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".mp3";
+        input.className = "file-input";
+
+        // 按鈕
+        const btn = document.createElement("button");
+        btn.className = "play-btn";
+        btn.innerText = `播放音樂 ${i + 1}`;
+
+        // 選擇 MP3
+        input.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+
+                audios[i] = new Audio(url);
+                audios[i].loop = false;
+            }
+        });
+
+        // 播放功能
+        function playMusic(index) {
+
+            if (!audios[index]) {
+                alert("請先選擇 MP3 音樂");
+                return;
+            }
+
+            // 停止前一首
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentAudio = audios[index];
+
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+        }
+
+        // 按鈕點擊
+        btn.addEventListener("click", () => {
+            playMusic(i);
+        });
+
+        box.appendChild(input);
+        box.appendChild(btn);
+
+        container.appendChild(box);
+    }
+
+    // 鍵盤快捷鍵 1~6
+    document.addEventListener("keydown", (e) => {
+
+        const key = parseInt(e.key);
+
+        if (key >= 1 && key <= 6) {
+
+            const index = key - 1;
+
+            if (!audios[index]) {
+                alert(`請先設定音樂 ${key}`);
+                return;
+            }
+
+            // 停止目前播放
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentAudio = audios[index];
+
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+        }
+    });
+
+</script>
+
+</body>
+</html>
