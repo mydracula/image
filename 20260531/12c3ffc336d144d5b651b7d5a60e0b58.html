@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公众号：付费密码</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            padding: 20px;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+        }
+        /* 轮播容器（默认显示，内嵌播放时隐藏） */
+        .carousel-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        /* 轮播列表 */
+        .carousel-list {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            flex: 0 0 100%;
+        }
+        .carousel-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+        /* 切换按钮 */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .prev-btn {
+            left: 15px;
+        }
+        .next-btn {
+            right: 15px;
+        }
+        /* 指示器 */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.5);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .indicator.active {
+            background-color: white;
+        }
+        /* 提示语 */
+        .tip-text {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        /* 搜索框样式（默认在轮播图下方，内嵌播放时上移） */
+        .search-container {
+            max-width: 800px;
+            margin: 20px auto 0;
+            display: flex;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        /* 内嵌播放时搜索框样式（顶部固定） */
+        .search-container.sticky {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin: 0;
+        }
+        #search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        #search-input:focus {
+            border-color: #666;
+        }
+        #search-btn {
+            padding: 12px 25px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #search-btn:hover {
+            background-color: #555;
+        }
+        /* 内嵌容器样式（占满手机屏幕剩余空间） */
+        #embed-container {
+            max-width: 800px;
+            margin: 20px auto 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 80px; /* 搜索框下方 */
+            left: 20px;
+            right: 20px;
+            bottom: 20px; /* 底部留边 */
+            height: calc(100vh - 120px); /* 屏幕高度 - 上下边距 - 搜索框高度 */
+        }
+        #embed-frame {
+            width: 100%;
+            height: 100%;
+            border: none; /* 隐藏边框 */
+        }
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .carousel-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .tip-text {
+                font-size: 16px;
+            }
+            .search-container {
+                flex-direction: column;
+                margin-top: 15px;
+            }
+            .search-container.sticky {
+                padding: 8px;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+            }
+            #search-input, #search-btn {
+                font-size: 15px;
+                padding: 10px 12px;
+            }
+            #embed-container {
+                top: 70px;
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                height: calc(100vh - 100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 轮播容器 -->
+    <div class="carousel-container" id="carousel-container">
+        <!-- 轮播图片列表（三条链接已按顺序替换） -->
+        <div class="carousel-list">
+            <div class="carousel-item">
+                <a href="https://pan.xunlei.com/s/VOffWNKjdwGnHm3mI-O_Q1SXA1?pwd=pbrj#" target="_blank">
+                    <img src="https://picsum.photos/800/450?random=1" alt="资源1" class="carousel-img">
+                </a>
+            </div>
+            <div class="carousel-item">
+                <a href="https://pan.xunlei.com/s/VOffWOlQErVpPaoDjxlNr6WkA1?pwd=2q2k#" target="_blank">
+                    <img src="https://picsum.photos/800/450?random=2" alt="资源2" class="carousel-img">
+                </a>
+            </div>
+            <div class="carousel-item">
+                <a href="https://pan.xunlei.com/s/VOffWSORlYIcUc-xq29jqBWZA1?pwd=qbfu#" target="_blank">
+                    <img src="https://picsum.photos/800/450?random=3" alt="资源3" class="carousel-img">
+                </a>
+            </div>
+        </div>
+        <!-- 切换按钮 -->
+        <button class="carousel-btn prev-btn">&lt;</button>
+        <button class="carousel-btn next-btn">&gt;</button>
+        <!-- 指示器 -->
+        <div class="carousel-indicators">
+            <button class="indicator active" data-index="0"></button>
+            <button class="indicator" data-index="1"></button>
+            <button class="indicator" data-index="2"></button>
+        </div>
+    </div>
+    <!-- 提示语 -->
+    <p class="tip-text" id="tip-text">点击图片查看</p>
+    <!-- 搜索框（默认在轮播图下方，内嵌播放时上移置顶） -->
+    <div class="search-container" id="search-container">
+        <input type="text" id="search-input" placeholder="输入关键词搜索资源...">
+        <button id="search-btn">搜索</button>
+    </div>
+    <!-- 内嵌播放容器（隐藏链接+占满屏幕） -->
+    <div id="embed-container">
+        <iframe id="embed-frame" src="" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // 轮播图核心逻辑
+        const carouselList = document.querySelector('.carousel-list');
+        const carouselItems = document.querySelectorAll('.carousel-item');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const indicators = document.querySelectorAll('.indicator');
+        let currentIndex = 0;
+        const itemWidth = 100; // 百分比
+        const autoPlayInterval = 3000; // 自动轮播间隔（毫秒）
+
+        // 更新轮播位置
+        function updateCarousel() {
+            carouselList.style.transform = `translateX(-${currentIndex * itemWidth}%)`;
+            // 更新指示器状态
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        // 下一张
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % carouselItems.length;
+            updateCarousel();
+        }
+
+        // 上一张
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+            updateCarousel();
+        }
+
+        // 绑定按钮事件
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // 绑定指示器事件
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', () => {
+                currentIndex = parseInt(indicator.dataset.index);
+                updateCarousel();
+            });
+        });
+        // 自动轮播
+        let autoPlayTimer = setInterval(nextSlide, autoPlayInterval);
+
+        // 鼠标悬停暂停自动轮播
+        document.querySelector('.carousel-container').addEventListener('mouseenter', () => {
+            clearInterval(autoPlayTimer);
+        });
+
+        // 鼠标离开恢复自动轮播
+        document.querySelector('.carousel-container').addEventListener('mouseleave', () => {
+            autoPlayTimer = setInterval(nextSlide, autoPlayInterval);
+        });
+
+        // 核心元素获取
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const embedContainer = document.getElementById('embed-container');
+        const embedFrame = document.getElementById('embed-frame');
+        const carouselContainer = document.getElementById('carousel-container');
+        const tipText = document.getElementById('tip-text');
+        const searchContainer = document.getElementById('search-container');
+
+        // 资源关键词映射（同步替换三条链接，精准匹配）
+        const resourceKeywords = [
+            { keywords: ['资源1'], url: 'https://pan.xunlei.com/s/VOffWNKjdwGnHm3mI-O_Q1SXA1?pwd=pbrj#', type: 'external' },
+            { keywords: ['资源2'], url: 'https://pan.xunlei.com/s/VOffWOlQErVpPaoDjxlNr6WkA1?pwd=2q2k#', type: 'external' },
+            { keywords: ['资源3'], url: 'https://pan.xunlei.com/s/VOffWSORlYIcUc-xq29jqBWZA1?pwd=qbfu#', type: 'external' },
+            { keywords: ['小姐姐'], url: 'https://www.tuwei.space/home.html', type: 'embed' } // 内嵌播放
+        ];
+
+        // 重置页面状态（显示轮播图+提示语，隐藏内嵌容器，取消搜索框置顶）
+        function resetPageState() {
+            embedContainer.style.display = 'none';
+            embedFrame.src = '';
+            carouselContainer.style.display = 'block';
+            tipText.style.display = 'block';
+            searchContainer.classList.remove('sticky');
+            document.body.style.paddingBottom = '20px';
+        }
+
+        // 搜索处理函数（修正布局逻辑+全屏内嵌）
+        function handleSearch() {
+            const keyword = searchInput.value.trim();
+            if (!keyword) {
+                alert('请输入搜索关键词！');
+                return;
+            }
+
+            // 精准匹配关键词（完全相等才触发）
+            const matchedResource = resourceKeywords.find(resource => 
+                resource.keywords.includes(keyword)
+            );
+
+            if (matchedResource) {
+                if (matchedResource.type === 'embed') {
+                    // 内嵌播放逻辑：隐藏轮播图+搜索框上移置顶+内嵌占满屏幕
+                    carouselContainer.style.display = 'none';
+                    tipText.style.display = 'none';
+                    searchContainer.classList.add('sticky'); // 搜索框上移固定
+                    embedContainer.style.display = 'block';
+                    embedFrame.src = matchedResource.url;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    // 外部资源：重置状态+新窗口跳转
+                    resetPageState();
+                    window.open(matchedResource.url, '_blank');
+                }
+            } else {
+                // 无匹配结果：重置页面状态
+                resetPageState();
+                alert('未找到匹配的资源，请输入正确关键词！');
+            }
+            // 清空输入框
+            searchInput.value = '';
+        }
+
+        // 绑定搜索事件（点击按钮+回车触发）
+        searchBtn.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        // 点击搜索框时若有内嵌内容，自动重置状态
+        searchInput.addEventListener('focus', () => {
+            if (embedContainer.style.display === 'block') {
+                resetPageState();
+            }
+        });
+    </script>
+</body>
+</html>
