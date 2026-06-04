@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>丽云缘分登记</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e11d48',
+                        secondary: '#f43f5e',
+                        accent: '#fda4af',
+                        light: '#fff1f2',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(225, 29, 72, 0.1);
+            }
+            .btn-gradient {
+                background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+            }
+            .input-focus:focus {
+                border-color: #e11d48;
+                box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2);
+            }
+            .info-card {
+                background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-light min-h-screen font-sans">
+    <!-- 首页 -->
+    <div id="homePage" class="page">
+        <div class="container mx-auto px-4 py-8 max-w-md">
+            <div class="flex justify-end mb-4">
+                <button onclick="refreshApp()" class="text-gray-600 p-2">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mb-10 mt-8">
+                <div class="w-28 h-28 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-heart text-white text-5xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-primary mb-2">丽云缘分登记</h1>
+                <p class="text-gray-600">遇见对的人，共度一生</p>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="showPage('registerPage')" class="w-full btn-gradient text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]">
+                    <i class="fa fa-pencil mr-2"></i> 我要登记
+                </button>
+                <button onclick="showPage('databasePage')" class="w-full bg-white text-primary border-2 border-primary py-4 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02]">
+                    <i class="fa fa-database mr-2"></i> 信息库
+                </button>
+            </div>
+            
+            <div class="mt-12 text-center text-gray-500 text-sm">
+                <p>所有数据仅保存在本地设备中</p>
+                <p>保护您的隐私安全</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 信息库页面 -->
+    <div id="databasePage" class="page hidden">
+        <div class="container mx-auto px-4 py-6 max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showPage('homePage')" class="text-gray-600 p-2">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-primary">信息库</h2>
+                <button onclick="refreshDatabase()" class="text-gray-600 p-2">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="databaseList" class="space-y-3">
+                <!-- 信息列表将在这里动态生成 -->
+            </div>
+            
+            <div id="emptyDatabase" class="text-center py-16 hidden">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-database text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">信息库为空</h3>
+                <p class="text-gray-500 mb-6">还没有登记任何信息</p>
+                <button onclick="showPage('registerPage')" class="btn-gradient text-white px-6 py-3 rounded-lg font-semibold">
+                    去登记
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登记页面 -->
+    <div id="registerPage" class="page hidden">
+        <div class="container mx-auto px-4 py-6 max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showPage('homePage')" class="text-gray-600 p-2">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-primary">个人信息登记</h2>
+                <button onclick="refreshRegisterPage()" class="text-gray-600 p-2">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <button onclick="pasteFromClipboard()" class="w-full bg-green-50 text-green-600 border-2 border-green-200 py-3 rounded-xl font-medium hover:bg-green-100 transition-all">
+                    <i class="fa fa-paste mr-2"></i> 粘贴填充信息
+                </button>
+            </div>
+            
+            <form id="registrationForm" class="space-y-5">
+                <!-- 照片上传 -->
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">基本信息</h3>
+                    <div class="flex flex-col items-center mb-4">
+                        <div id="photoPreview" class="w-40 h-40 rounded-full bg-gray-200 flex items-center justify-center mb-3 overflow-hidden border-4 border-accent">
+                            <i class="fa fa-user text-gray-400 text-5xl"></i>
+                        </div>
+                        <label class="bg-primary text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-secondary transition-colors">
+                            <i class="fa fa-camera mr-2"></i> 上传照片
+                            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                        </label>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">姓名 <span class="text-primary">*</span></label>
+                            <input type="text" id="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">性别 <span class="text-primary">*</span></label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="gender" value="男" required class="mr-2 text-primary">
+                                    <span>男</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="gender" value="女" required class="mr-2 text-primary">
+                                    <span>女</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">籍贯 <span class="text-primary">*</span></label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <select id="province" required class="px-2 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none text-sm">
+                                    <option value="">选择省</option>
+                                </select>
+                                <select id="city" required class="px-2 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none text-sm">
+                                    <option value="">选择市</option>
+                                </select>
+                                <select id="district" required class="px-2 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none text-sm">
+                                    <option value="">选择区</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">婚姻状况 <span class="text-primary">*</span></label>
+                            <select id="maritalStatus" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="">请选择</option>
+                                <option value="未婚">未婚</option>
+                                <option value="离异">离异</option>
+                                <option value="丧偶">丧偶</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">出生日期 <span class="text-primary">*</span></label>
+                            <input type="date" id="birthDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none" onchange="calculateZodiac()">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">生肖</label>
+                            <input type="text" id="zodiac" readonly class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm">身高(cm) <span class="text-primary">*</span></label>
+                                <input type="number" id="height" required min="100" max="250" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm">体重(kg)</label>
+                                <input type="number" id="weight" min="30" max="200" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 工作与经济 -->
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">工作与经济</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">学历 <span class="text-primary">*</span></label>
+                            <select id="education" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="">请选择</option>
+                                <option value="初中及以下">初中及以下</option>
+                                <option value="高中/中专">高中/中专</option>
+                                <option value="大专">大专</option>
+                                <option value="本科">本科</option>
+                                <option value="硕士">硕士</option>
+                                <option value="博士及以上">博士及以上</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">工作单位/职业 <span class="text-primary">*</span></label>
+                            <input type="text" id="job" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">月收入 <span class="text-primary">*</span></label>
+                            <select id="income" required class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="">请选择</option>
+                                <option value="3000以下">3000以下</option>
+                                <option value="3000-5000">3000-5000</option>
+                                <option value="5000-8000">5000-8000</option>
+                                <option value="8000-12000">8000-12000</option>
+                                <option value="12000-20000">12000-20000</option>
+                                <option value="20000以上">20000以上</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">房产情况</label>
+                            <select id="property" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="">请选择</option>
+                                <option value="无房">无房</option>
+                                <option value="有房无贷">有房无贷</option>
+                                <option value="有房有贷">有房有贷</option>
+                                <option value="多套房产">多套房产</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">是否有房贷车贷</label>
+                            <select id="hasLoan" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none" onchange="toggleLoanInputs()">
+                                <option value="无">无</option>
+                                <option value="有">有</option>
+                            </select>
+                        </div>
+                        
+                        <div id="loanInputs" class="hidden space-y-3">
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm">房贷月供(元)</label>
+                                <input type="number" id="mortgage" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-1 text-sm">车贷月供(元)</label>
+                                <input type="number" id="carLoan" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 家庭与爱好 -->
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">家庭与爱好</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">父母工作情况</label>
+                            <input type="text" id="parentsJob" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">爱好特长</label>
+                            <textarea id="hobbies" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">是否原生家庭</label>
+                            <select id="isNuclearFamily" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 心仪对象要求 -->
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">心仪对象要求</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">期望年龄范围</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-gray-500 mb-1 text-xs">最小年龄</label>
+                                    <select id="minAge" class="w-full px-2 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                        <option value="18">18</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 mb-1 text-xs">最大年龄</label>
+                                    <select id="maxAge" class="w-full px-2 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                        <option value="60">60</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">期望身高(cm)以上</label>
+                            <input type="number" id="expectedHeight" min="100" max="250" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">期望性格</label>
+                            <input type="text" id="expectedPersonality" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none" placeholder="如：开朗、稳重、温柔">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">期望工作性质</label>
+                            <input type="text" id="expectedJobType" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none" placeholder="如：稳定、国企、自由职业">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">是否接受再婚</label>
+                            <select id="acceptRemarriage" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-1 text-sm">是否接受外省</label>
+                            <select id="acceptOtherProvince" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus focus:outline-none">
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pt-4 pb-8 space-y-3">
+                    <button type="submit" class="w-full btn-gradient text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all">
+                        <i class="fa fa-save mr-2"></i> 保存信息
+                    </button>
+                    <button type="button" onclick="saveAndMatch()" class="w-full bg-white text-primary border-2 border-primary py-4 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all">
+                        <i class="fa fa-search mr-2"></i> 保存并开始匹配
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 个人信息页面 -->
+    <div id="profilePage" class="page hidden">
+        <div class="container mx-auto px-4 py-6 max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showPage('homePage')" class="text-gray-600 p-2">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h2 id="profileTitle" class="text-xl font-bold text-primary">我的信息</h2>
+                <button onclick="refreshProfilePage()" class="text-gray-600 p-2">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button onclick="copyProfileToClipboard()" class="bg-blue-50 text-blue-600 border-2 border-blue-200 py-3 rounded-xl font-medium hover:bg-blue-100 transition-all">
+                    <i class="fa fa-copy mr-2"></i> 复制文本
+                </button>
+                <button onclick="generateInfoCard()" class="bg-purple-50 text-purple-600 border-2 border-purple-200 py-3 rounded-xl font-medium hover:bg-purple-100 transition-all">
+                    <i class="fa fa-camera mr-2"></i> 生成卡片
+                </button>
+            </div>
+            
+            <div id="profileContent" class="space-y-4">
+                <!-- 个人信息将在这里动态生成 -->
+            </div>
+            
+            <div class="pt-4 pb-8 space-y-3">
+                <button onclick="showPage('registerPage')" class="w-full bg-white text-primary border-2 border-primary py-4 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all">
+                    <i class="fa fa-pencil mr-2"></i> 编辑信息
+                </button>
+                <button onclick="showPage('matchPage')" class="w-full btn-gradient text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all">
+                    <i class="fa fa-search mr-2"></i> 开始匹配
+                </button>
+                <button onclick="deleteProfile()" class="w-full bg-red-50 text-red-600 border-2 border-red-200 py-4 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all">
+                    <i class="fa fa-trash mr-2"></i> 删除我的信息
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 匹配结果页面 -->
+    <div id="matchPage" class="page hidden">
+        <div class="container mx-auto px-4 py-6 max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showPage('profilePage')" class="text-gray-600 p-2">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-primary">匹配结果</h2>
+                <button onclick="refreshMatches()" class="text-gray-600 p-2">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="noMatches" class="text-center py-16 hidden">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-search text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">暂无匹配结果</h3>
+                <p class="text-gray-500 mb-6">请先完成个人信息登记</p>
+                <button onclick="showPage('registerPage')" class="btn-gradient text-white px-6 py-3 rounded-lg font-semibold">
+                    去登记
+                </button>
+            </div>
+            
+            <div id="matchResults" class="space-y-4">
+                <!-- 匹配结果将在这里动态生成 -->
+            </div>
+            
+            <div id="matchNavigation" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-4">
+                <div class="flex justify-between items-center max-w-md mx-auto">
+                    <button id="prevMatch" onclick="previousMatch()" class="p-2 text-primary disabled:text-gray-400" disabled>
+                        <i class="fa fa-chevron-left text-xl"></i>
+                    </button>
+                    <span id="matchIndicator" class="text-gray-600">1/1</span>
+                    <button id="nextMatch" onclick="nextMatch()" class="p-2 text-primary disabled:text-gray-400" disabled>
+                        <i class="fa fa-chevron-right text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 匹配详情弹窗 -->
+    <div id="matchDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-lg font-semibold text-gray-800">详细资料</h3>
+                <button onclick="closeMatchDetail()" class="text-gray-500 p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="matchDetailContent" class="p-4">
+                <!-- 详细资料将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 信息卡片生成弹窗 -->
+    <div id="cardModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl w-full max-w-md mx-4">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">信息卡片</h3>
+                <button onclick="closeCardModal()" class="text-gray-500 p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div id="infoCard" class="info-card rounded-xl p-6 mb-4">
+                    <!-- 信息卡片将在这里动态生成 -->
+                </div>
+                <div class="space-y-3">
+                    <button onclick="copyCardToClipboard()" class="w-full btn-gradient text-white py-3 rounded-xl font-semibold">
+                        <i class="fa fa-copy mr-2"></i> 复制图片到剪贴板
+                    </button>
+                    <button onclick="downloadCard()" class="w-full bg-white text-primary border-2 border-primary py-3 rounded-xl font-semibold">
+                        <i class="fa fa-download mr-2"></i> 下载图片
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let allUsers = [];
+        let matches = [];
+        let currentMatchIndex = 0;
+        let photoBase64 = null;
+        let currentCardCanvas = null;
+
+        // 完整的省市区数据
+        const provinceData = {
+            "北京市": ["市辖区"],
+            "天津市": ["市辖区"],
+            "上海市": ["市辖区"],
+            "重庆市": ["市辖区"],
+            "河北省": ["石家庄市", "唐山市", "秦皇岛市", "邯郸市", "邢台市", "保定市", "张家口市", "承德市", "沧州市", "廊坊市", "衡水市"],
+            "山西省": ["太原市", "大同市", "阳泉市", "长治市", "晋城市", "朔州市", "晋中市", "运城市", "忻州市", "临汾市", "吕梁市"],
+            "内蒙古自治区": ["呼和浩特市", "包头市", "乌海市", "赤峰市", "通辽市", "鄂尔多斯市", "呼伦贝尔市", "巴彦淖尔市", "乌兰察布市"],
+            "辽宁省": ["沈阳市", "大连市", "鞍山市", "抚顺市", "本溪市", "丹东市", "锦州市", "营口市", "阜新市", "辽阳市", "盘锦市", "铁岭市", "朝阳市", "葫芦岛市"],
+            "吉林省": ["长春市", "吉林市", "四平市", "辽源市", "通化市", "白山市", "松原市", "白城市"],
+            "黑龙江省": ["哈尔滨市", "齐齐哈尔市", "鸡西市", "鹤岗市", "双鸭山市", "大庆市", "伊春市", "佳木斯市", "七台河市", "牡丹江市", "黑河市", "绥化市"],
+            "江苏省": ["南京市", "无锡市", "徐州市", "常州市", "苏州市", "南通市", "连云港市", "淮安市", "盐城市", "扬州市", "镇江市", "泰州市", "宿迁市"],
+            "浙江省": ["杭州市", "宁波市", "温州市", "嘉兴市", "湖州市", "绍兴市", "金华市", "衢州市", "舟山市", "台州市", "丽水市"],
+            "安徽省": ["合肥市", "芜湖市", "蚌埠市", "淮南市", "马鞍山市", "淮北市", "铜陵市", "安庆市", "黄山市", "滁州市", "阜阳市", "宿州市", "六安市", "亳州市", "池州市", "宣城市"],
+            "福建省": ["福州市", "厦门市", "莆田市", "三明市", "泉州市", "漳州市", "南平市", "龙岩市", "宁德市"],
+            "江西省": ["南昌市", "景德镇市", "萍乡市", "九江市", "新余市", "鹰潭市", "赣州市", "吉安市", "宜春市", "抚州市", "上饶市"],
+            "山东省": ["济南市", "青岛市", "淄博市", "枣庄市", "东营市", "烟台市", "潍坊市", "济宁市", "泰安市", "威海市", "日照市", "临沂市", "德州市", "聊城市", "滨州市", "菏泽市"],
+            "河南省": ["郑州市", "开封市", "洛阳市", "平顶山市", "安阳市", "鹤壁市", "新乡市", "焦作市", "濮阳市", "许昌市", "漯河市", "三门峡市", "南阳市", "商丘市", "信阳市", "周口市", "驻马店市"],
+            "湖北省": ["武汉市", "黄石市", "十堰市", "宜昌市", "襄阳市", "鄂州市", "荆门市", "孝感市", "荆州市", "黄冈市", "咸宁市", "随州市"],
+            "湖南省": ["长沙市", "株洲市", "湘潭市", "衡阳市", "邵阳市", "岳阳市", "常德市", "张家界市", "益阳市", "郴州市", "永州市", "怀化市", "娄底市"],
+            "广东省": ["广州市", "韶关市", "深圳市", "珠海市", "汕头市", "佛山市", "江门市", "湛江市", "茂名市", "肇庆市", "惠州市", "梅州市", "汕尾市", "河源市", "阳江市", "清远市", "东莞市", "中山市", "潮州市", "揭阳市", "云浮市"],
+            "广西壮族自治区": ["南宁市", "柳州市", "桂林市", "梧州市", "北海市", "防城港市", "钦州市", "贵港市", "玉林市", "百色市", "贺州市", "河池市", "来宾市", "崇左市"],
+            "海南省": ["海口市", "三亚市", "三沙市", "儋州市"],
+            "四川省": ["成都市", "自贡市", "攀枝花市", "泸州市", "德阳市", "绵阳市", "广元市", "遂宁市", "内江市", "乐山市", "南充市", "眉山市", "宜宾市", "广安市", "达州市", "雅安市", "巴中市", "资阳市"],
+            "贵州省": ["贵阳市", "六盘水市", "遵义市", "安顺市", "毕节市", "铜仁市"],
+            "云南省": ["昆明市", "曲靖市", "玉溪市", "保山市", "昭通市", "丽江市", "普洱市", "临沧市"],
+            "西藏自治区": ["拉萨市", "日喀则市", "昌都市", "林芝市", "山南市", "那曲市"],
+            "陕西省": ["西安市", "铜川市", "宝鸡市", "咸阳市", "渭南市", "延安市", "汉中市", "榆林市", "安康市", "商洛市"],
+            "甘肃省": ["兰州市", "嘉峪关市", "金昌市", "白银市", "天水市", "武威市", "张掖市", "平凉市", "酒泉市", "庆阳市", "定西市", "陇南市"],
+            "青海省": ["西宁市", "海东市"],
+            "宁夏回族自治区": ["银川市", "石嘴山市", "吴忠市", "固原市", "中卫市"],
+            "新疆维吾尔自治区": ["乌鲁木齐市", "克拉玛依市", "吐鲁番市", "哈密市"],
+            "台湾省": ["台北市", "新北市", "桃园市", "台中市", "台南市", "高雄市"],
+            "香港特别行政区": ["香港岛", "九龙", "新界"],
+            "澳门特别行政区": ["澳门半岛", "氹仔", "路环"]
+        };
+
+        // 完整的区县数据（主要城市）
+        const districtData = {
+            "市辖区": ["东城区", "西城区", "朝阳区", "海淀区", "丰台区", "石景山区", "通州区", "顺义区", "昌平区", "大兴区", "房山区", "门头沟区", "怀柔区", "平谷区", "密云区", "延庆区"],
+            "南京市": ["玄武区", "秦淮区", "建邺区", "鼓楼区", "浦口区", "栖霞区", "雨花台区", "江宁区", "六合区", "溧水区", "高淳区"],
+            "无锡市": ["锡山区", "惠山区", "滨湖区", "梁溪区", "新吴区", "江阴市", "宜兴市"],
+            "徐州市": ["鼓楼区", "云龙区", "贾汪区", "泉山区", "铜山区", "丰县", "沛县", "睢宁县", "邳州市", "新沂市"],
+            "常州市": ["天宁区", "钟楼区", "新北区", "武进区", "金坛区", "溧阳市"],
+            "苏州市": ["虎丘区", "吴中区", "相城区", "姑苏区", "吴江区", "常熟市", "张家港市", "昆山市", "太仓市"],
+            "南通市": ["崇川区", "通州区", "海门区", "如东县", "启东市", "如皋市", "海安市"],
+            "连云港市": ["连云区", "海州区", "赣榆区", "东海县", "灌云县", "灌南县"],
+            "淮安市": ["淮安区", "淮阴区", "清江浦区", "洪泽区", "涟水县", "盱眙县", "金湖县"],
+            "盐城市": ["亭湖区", "盐都区", "大丰区", "响水县", "滨海县", "阜宁县", "射阳县", "建湖县", "东台市"],
+            "扬州市": ["广陵区", "邗江区", "江都区", "宝应县", "仪征市", "高邮市"],
+            "镇江市": ["京口区", "润州区", "丹徒区", "丹阳市", "扬中市", "句容市"],
+            "泰州市": ["海陵区", "高港区", "姜堰区", "兴化市", "靖江市", "泰兴市"],
+            "宿迁市": ["宿城区", "宿豫区", "沭阳县", "泗阳县", "泗洪县"],
+            "杭州市": ["上城区", "下城区", "江干区", "拱墅区", "西湖区", "滨江区", "萧山区", "余杭区", "富阳区", "临安区", "桐庐县", "淳安县", "建德市"],
+            "宁波市": ["海曙区", "江北区", "北仑区", "镇海区", "鄞州区", "奉化区", "象山县", "宁海县", "余姚市", "慈溪市"],
+            "温州市": ["鹿城区", "龙湾区", "瓯海区", "洞头区", "永嘉县", "平阳县", "苍南县", "文成县", "泰顺县", "瑞安市", "乐清市"],
+            "合肥市": ["瑶海区", "庐阳区", "蜀山区", "包河区", "长丰县", "肥东县", "肥西县", "庐江县", "巢湖市"],
+            "福州市": ["鼓楼区", "台江区", "仓山区", "马尾区", "晋安区", "长乐区", "闽侯县", "连江县", "罗源县", "闽清县", "永泰县", "平潭县", "福清市"],
+            "厦门市": ["思明区", "海沧区", "湖里区", "集美区", "同安区", "翔安区"],
+            "南昌市": ["东湖区", "西湖区", "青云谱区", "湾里区", "青山湖区", "新建区", "南昌县", "安义县", "进贤县"],
+            "济南市": ["历下区", "市中区", "槐荫区", "天桥区", "历城区", "长清区", "章丘区", "济阳区", "莱芜区", "钢城区", "平阴县", "商河县"],
+            "青岛市": ["市南区", "市北区", "黄岛区", "崂山区", "李沧区", "城阳区", "即墨区", "胶州市", "平度市", "莱西市"],
+            "郑州市": ["中原区", "二七区", "管城回族区", "金水区", "上街区", "惠济区", "中牟县", "巩义市", "荥阳市", "新密市", "新郑市", "登封市"],
+            "武汉市": ["江岸区", "江汉区", "硚口区", "汉阳区", "武昌区", "青山区", "洪山区", "东西湖区", "汉南区", "蔡甸区", "江夏区", "黄陂区", "新洲区"],
+            "长沙市": ["芙蓉区", "天心区", "岳麓区", "开福区", "雨花区", "望城区", "长沙县", "宁乡市", "浏阳市"],
+            "广州市": ["荔湾区", "越秀区", "海珠区", "天河区", "白云区", "黄埔区", "番禺区", "花都区", "南沙区", "从化区", "增城区"],
+            "深圳市": ["罗湖区", "福田区", "南山区", "宝安区", "龙岗区", "盐田区", "龙华区", "坪山区", "光明区"],
+            "成都市": ["锦江区", "青羊区", "金牛区", "武侯区", "成华区", "龙泉驿区", "青白江区", "新都区", "温江区", "双流区", "郫都区", "金堂县", "大邑县", "蒲江县", "新津县", "都江堰市", "彭州市", "邛崃市", "崇州市", "简阳市"],
+            "西安市": ["新城区", "碑林区", "莲湖区", "灞桥区", "未央区", "雁塔区", "阎良区", "临潼区", "长安区", "高陵区", "鄠邑区", "蓝田县", "周至县"]
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // 初始化年龄选择器
+            initializeAgeSelectors();
+            
+            // 初始化省市区选择器
+            initializeLocationSelectors();
+            
+            // 加载已保存的数据
+            loadSavedData();
+            
+            // 表单提交处理
+            document.getElementById('registrationForm').addEventListener('submit', handleFormSubmit);
+        }
+
+        // 页面切换
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // 显示目标页面
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // 如果是信息库页面，加载信息库
+            if (pageId === 'databasePage') {
+                loadDatabase();
+            }
+            
+            // 如果是个人信息页面，加载个人信息
+            if (pageId === 'profilePage') {
+                loadProfile();
+            }
+            
+            // 如果是匹配页面，加载匹配结果
+            if (pageId === 'matchPage') {
+                loadMatches();
+            }
+            
+            // 如果是登记页面，确保表单是空白的
+            if (pageId === 'registerPage') {
+                refreshRegisterPage(true);
+            }
+        }
+
+        // 刷新整个应用
+        function refreshApp() {
+            if (confirm('确定要刷新吗？所有未保存的信息将丢失。')) {
+                location.reload();
+            }
+        }
+
+        // 刷新登记页面
+        function refreshRegisterPage(force = false) {
+            if (force || confirm('确定要清空表单吗？')) {
+                document.getElementById('registrationForm').reset();
+                document.getElementById('photoPreview').innerHTML = '<i class="fa fa-user text-gray-400 text-5xl"></i>';
+                photoBase64 = null;
+                document.getElementById('zodiac').value = '';
+                document.getElementById('loanInputs').classList.add('hidden');
+                
+                // 重置省市区选择器
+                document.getElementById('province').value = '';
+                document.getElementById('city').innerHTML = '<option value="">选择市</option>';
+                document.getElementById('district').innerHTML = '<option value="">选择区</option>';
+                
+                // 重置年龄选择器
+                document.getElementById('minAge').value = 20;
+                document.getElementById('maxAge').value = 35;
+            }
+        }
+
+        // 刷新个人信息页面
+        function refreshProfilePage() {
+            loadProfile();
+        }
+
+        // 刷新信息库
+        function refreshDatabase() {
+            loadDatabase();
+        }
+
+        // 初始化年龄选择器
+        function initializeAgeSelectors() {
+            const minAgeSelect = document.getElementById('minAge');
+            const maxAgeSelect = document.getElementById('maxAge');
+            
+            // 清空现有选项
+            minAgeSelect.innerHTML = '';
+            maxAgeSelect.innerHTML = '';
+            
+            // 添加年龄选项
+            for (let i = 18; i <= 60; i++) {
+                const minOption = document.createElement('option');
+                minOption.value = i;
+                minOption.textContent = i;
+                minAgeSelect.appendChild(minOption);
+                
+                const maxOption = document.createElement('option');
+                maxOption.value = i;
+                maxOption.textContent = i;
+                maxAgeSelect.appendChild(maxOption);
+            }
+            
+            // 设置默认值
+            minAgeSelect.value = 20;
+            maxAgeSelect.value = 35;
+        }
+
+        // 初始化省市区选择器
+        function initializeLocationSelectors() {
+            const provinceSelect = document.getElementById('province');
+            const citySelect = document.getElementById('city');
+            const districtSelect = document.getElementById('district');
+            
+            // 添加省份
+            Object.keys(provinceData).forEach(province => {
+                const option = document.createElement('option');
+                option.value = province;
+                option.textContent = province;
+                provinceSelect.appendChild(option);
+            });
+            
+            // 省份变化时更新城市
+            provinceSelect.addEventListener('change', function() {
+                citySelect.innerHTML = '<option value="">选择市</option>';
+                districtSelect.innerHTML = '<option value="">选择区</option>';
+                
+                if (this.value) {
+                    const cities = provinceData[this.value];
+                    cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                    
+                    // 如果是直辖市，自动选择"市辖区"
+                    if (["北京市", "天津市", "上海市", "重庆市"].includes(this.value)) {
+                        citySelect.value = "市辖区";
+                        // 触发城市变化事件
+                        citySelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+            
+            // 城市变化时更新区县
+            citySelect.addEventListener('change', function() {
+                districtSelect.innerHTML = '<option value="">选择区</option>';
+                
+                if (this.value) {
+                    // 优先使用专门的区县数据，如果没有则生成通用选项
+                    let districts = districtData[this.value] || [];
+                    
+                    // 如果没有找到对应城市的区县数据，生成通用选项
+                    if (districts.length === 0) {
+                        for (let i = 1; i <= 10; i++) {
+                            districts.push(`区县${i}`);
+                        }
+                    }
+                    
+                    districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        // 处理照片上传
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // 创建canvas调整图片大小
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 设置更大的尺寸，适合手机屏幕
+                    const size = 300;
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    // 裁剪并绘制图片
+                    const minDim = Math.min(img.width, img.height);
+                    const sx = (img.width - minDim) / 2;
+                    const sy = (img.height - minDim) / 2;
+                    
+                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+                    
+                    // 转换为base64
+                    photoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+                    
+                    // 显示预览
+                    document.getElementById('photoPreview').innerHTML = 
+                        `<img src="${photoBase64}" alt="照片" class="w-full h-full object-cover">`;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 计算生肖
+        function calculateZodiac() {
+            const birthDate = document.getElementById('birthDate').value;
+            if (!birthDate) return;
+            
+            const year = new Date(birthDate).getFullYear();
+            const zodiacs = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+            const zodiacIndex = (year - 1900) % 12;
+            document.getElementById('zodiac').value = zodiacs[zodiacIndex];
+        }
+
+        // 切换贷款输入显示
+        function toggleLoanInputs() {
+            const hasLoan = document.getElementById('hasLoan').value;
+            const loanInputs = document.getElementById('loanInputs');
+            
+            if (hasLoan === '有') {
+                loanInputs.classList.remove('hidden');
+            } else {
+                loanInputs.classList.add('hidden');
+            }
+        }
+
+        // 处理表单提交
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            saveFormData();
+            showPage('profilePage');
+        }
+
+        // 保存并匹配
+        function saveAndMatch() {
+            if (document.getElementById('registrationForm').checkValidity()) {
+                saveFormData();
+                showPage('matchPage');
+            } else {
+                document.getElementById('registrationForm').reportValidity();
+            }
+        }
+
+        // 保存表单数据
+        function saveFormData() {
+            // 收集表单数据
+            const formData = {
+                id: Date.now().toString(), // 生成唯一ID
+                photo: photoBase64,
+                name: document.getElementById('name').value,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                province: document.getElementById('province').value,
+                city: document.getElementById('city').value,
+                district: document.getElementById('district').value,
+                maritalStatus: document.getElementById('maritalStatus').value,
+                birthDate: document.getElementById('birthDate').value,
+                zodiac: document.getElementById('zodiac').value,
+                height: document.getElementById('height').value,
+                weight: document.getElementById('weight').value,
+                education: document.getElementById('education').value,
+                job: document.getElementById('job').value,
+                income: document.getElementById('income').value,
+                property: document.getElementById('property').value,
+                hasLoan: document.getElementById('hasLoan').value,
+                mortgage: document.getElementById('mortgage').value || 0,
+                carLoan: document.getElementById('carLoan').value || 0,
+                parentsJob: document.getElementById('parentsJob').value,
+                hobbies: document.getElementById('hobbies').value,
+                isNuclearFamily: document.getElementById('isNuclearFamily').value,
+                minAge: document.getElementById('minAge').value,
+                maxAge: document.getElementById('maxAge').value,
+                expectedHeight: document.getElementById('expectedHeight').value,
+                expectedPersonality: document.getElementById('expectedPersonality').value,
+                expectedJobType: document.getElementById('expectedJobType').value,
+                acceptRemarriage: document.getElementById('acceptRemarriage').value,
+                acceptOtherProvince: document.getElementById('acceptOtherProvince').value,
+                registeredAt: new Date().toISOString()
+            };
+            
+            // 如果是编辑现有用户，保留原ID
+            if (currentUser && currentUser.id) {
+                formData.id = currentUser.id;
+            }
+            
+            // 保存当前用户
+            currentUser = formData;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // 添加到所有用户列表（如果不存在则添加，存在则更新）
+            const existingIndex = allUsers.findIndex(u => u.id === formData.id);
+            if (existingIndex === -1) {
+                allUsers.push(formData);
+            } else {
+                allUsers[existingIndex] = formData;
+            }
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            
+            // 提示成功
+            alert('信息保存成功！');
+        }
+
+        // 删除个人信息
+        function deleteProfile() {
+            if (!currentUser) {
+                alert('没有可删除的信息');
+                return;
+            }
+            
+            if (confirm('确定要删除您的个人信息吗？此操作不可恢复！')) {
+                // 从所有用户列表中删除
+                allUsers = allUsers.filter(u => u.id !== currentUser.id);
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                
+                // 清除当前用户
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                
+                alert('信息已删除');
+                showPage('homePage');
+            }
+        }
+
+        // 复制个人信息到剪贴板
+        function copyProfileToClipboard() {
+            if (!currentUser) {
+                alert('没有可复制的信息');
+                return;
+            }
+            
+            // 创建可分享的文本格式
+            const shareText = `【丽云缘分登记 - ${currentUser.name}】
+====================
+基本信息
+姓名：${currentUser.name}
+性别：${currentUser.gender}
+年龄：${calculateAge(currentUser.birthDate)}岁
+生肖：${currentUser.zodiac}
+出生日期：${currentUser.birthDate}
+籍贯：${currentUser.province} ${currentUser.city} ${currentUser.district}
+身高：${currentUser.height}cm
+体重：${currentUser.weight || '未填写'}kg
+学历：${currentUser.education}
+婚姻状况：${currentUser.maritalStatus}
+
+工作与经济
+职业：${currentUser.job}
+月收入：${currentUser.income}
+房产情况：${currentUser.property || '未填写'}
+${currentUser.hasLoan === '有' ? `房贷月供：${currentUser.mortgage}元\n车贷月供：${currentUser.carLoan}元` : '贷款情况：无'}
+
+家庭与爱好
+父母工作：${currentUser.parentsJob || '未填写'}
+爱好特长：${currentUser.hobbies || '未填写'}
+原生家庭：${currentUser.isNuclearFamily}
+
+心仪对象要求
+年龄：${currentUser.minAge}-${currentUser.maxAge}岁
+身高：${currentUser.expectedHeight || '无要求'}cm以上
+性格：${currentUser.expectedPersonality || '无要求'}
+工作性质：${currentUser.expectedJobType || '无要求'}
+接受再婚：${currentUser.acceptRemarriage}
+接受外省：${currentUser.acceptOtherProvince}
+====================
+数据来自：丽云缘分登记系统`;
+            
+            // 复制到剪贴板
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('信息已复制到剪贴板！');
+            }).catch(err => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = shareText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('信息已复制到剪贴板！');
+            });
+        }
+
+        // 从剪贴板粘贴填充表单
+        function pasteFromClipboard() {
+            navigator.clipboard.readText().then(text => {
+                try {
+                    // 尝试解析JSON格式
+                    const data = JSON.parse(text);
+                    fillFormWithData(data);
+                    alert('信息已填充！');
+                } catch (e) {
+                    // 如果不是JSON，尝试解析文本格式
+                    const data = parseTextToData(text);
+                    if (data) {
+                        fillFormWithData(data);
+                        alert('信息已填充！');
+                    } else {
+                        alert('无法解析剪贴板内容，请确保复制的是正确的缘分登记信息');
+                    }
+                }
+            }).catch(err => {
+                alert('无法访问剪贴板，请手动粘贴');
+            });
+        }
+
+        // 解析文本格式的数据
+        function parseTextToData(text) {
+            const data = {};
+            
+            // 简单的文本解析
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                const parts = line.split('：');
+                if (parts.length === 2) {
+                    const key = parts[0].trim();
+                    const value = parts[1].trim();
+                    
+                    switch(key) {
+                        case '姓名': data.name = value; break;
+                        case '性别': data.gender = value; break;
+                        case '出生日期': data.birthDate = value; break;
+                        case '生肖': data.zodiac = value; break;
+                        case '身高': data.height = value.replace('cm', ''); break;
+                        case '体重': data.weight = value.replace('kg', '').replace('未填写', ''); break;
+                        case '学历': data.education = value; break;
+                        case '婚姻状况': data.maritalStatus = value; break;
+                        case '职业': data.job = value; break;
+                        case '月收入': data.income = value; break;
+                        case '房产情况': data.property = value.replace('未填写', ''); break;
+                        case '父母工作': data.parentsJob = value.replace('未填写', ''); break;
+                        case '爱好特长': data.hobbies = value.replace('未填写', ''); break;
+                        case '原生家庭': data.isNuclearFamily = value; break;
+                        case '接受再婚': data.acceptRemarriage = value; break;
+                        case '接受外省': data.acceptOtherProvince = value; break;
+                    }
+                    
+                    // 解析籍贯
+                    if (key === '籍贯') {
+                        const parts = value.split(' ');
+                        data.province = parts[0] || '';
+                        data.city = parts[1] || '';
+                        data.district = parts[2] || '';
+                    }
+                    
+                    // 解析年龄范围
+                    if (key === '年龄' && !line.includes('以上')) {
+                        const ageParts = value.replace('岁', '').split('-');
+                        data.minAge = ageParts[0] || 20;
+                        data.maxAge = ageParts[1] || 35;
+                    }
+                    
+                    // 解析期望身高
+                    if (key === '身高' && line.includes('以上')) {
+                        data.expectedHeight = value.replace('cm以上', '').replace('无要求', '');
+                    }
+                    
+                    // 解析期望性格
+                    if (key === '性格') {
+                        data.expectedPersonality = value.replace('无要求', '');
+                    }
+                    
+                    // 解析期望工作性质
+                    if (key === '工作性质') {
+                        data.expectedJobType = value.replace('无要求', '');
+                    }
+                    
+                    // 解析贷款
+                    if (key === '房贷月供') {
+                        data.hasLoan = '有';
+                        data.mortgage = value.replace('元', '');
+                    }
+                    if (key === '车贷月供') {
+                        data.hasLoan = '有';
+                        data.carLoan = value.replace('元', '');
+                    }
+                }
+            });
+            
+            return Object.keys(data).length > 0 ? data : null;
+        }
+
+        // 用数据填充表单
+        function fillFormWithData(data) {
+            // 清空表单
+            refreshRegisterPage(true);
+            
+            // 填充基本信息
+            if (data.name) document.getElementById('name').value = data.name;
+            if (data.gender) {
+                const genderRadio = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+                if (genderRadio) genderRadio.checked = true;
+            }
+            if (data.birthDate) {
+                document.getElementById('birthDate').value = data.birthDate;
+                calculateZodiac();
+            }
+            if (data.height) document.getElementById('height').value = data.height;
+            if (data.weight) document.getElementById('weight').value = data.weight;
+            if (data.education) document.getElementById('education').value = data.education;
+            if (data.maritalStatus) document.getElementById('maritalStatus').value = data.maritalStatus;
+            
+            // 填充籍贯
+            if (data.province) {
+                document.getElementById('province').value = data.province;
+                // 触发省份变化事件
+                document.getElementById('province').dispatchEvent(new Event('change'));
+                
+                // 填充城市
+                setTimeout(() => {
+                    if (data.city) {
+                        document.getElementById('city').value = data.city;
+                        // 触发城市变化事件
+                        document.getElementById('city').dispatchEvent(new Event('change'));
+                        
+                        // 填充区县
+                        setTimeout(() => {
+                            if (data.district) {
+                                document.getElementById('district').value = data.district;
+                            }
+                        }, 100);
+                    }
+                }, 100);
+            }
+            
+            // 填充工作与经济
+            if (data.job) document.getElementById('job').value = data.job;
+            if (data.income) document.getElementById('income').value = data.income;
+            if (data.property) document.getElementById('property').value = data.property;
+            if (data.hasLoan) {
+                document.getElementById('hasLoan').value = data.hasLoan;
+                toggleLoanInputs();
+                if (data.mortgage) document.getElementById('mortgage').value = data.mortgage;
+                if (data.carLoan) document.getElementById('carLoan').value = data.carLoan;
+            }
+            
+            // 填充家庭与爱好
+            if (data.parentsJob) document.getElementById('parentsJob').value = data.parentsJob;
+            if (data.hobbies) document.getElementById('hobbies').value = data.hobbies;
+            if (data.isNuclearFamily) document.getElementById('isNuclearFamily').value = data.isNuclearFamily;
+            
+            // 填充心仪对象要求
+            if (data.minAge) document.getElementById('minAge').value = data.minAge;
+            if (data.maxAge) document.getElementById('maxAge').value = data.maxAge;
+            if (data.expectedHeight) document.getElementById('expectedHeight').value = data.expectedHeight;
+            if (data.expectedPersonality) document.getElementById('expectedPersonality').value = data.expectedPersonality;
+            if (data.expectedJobType) document.getElementById('expectedJobType').value = data.expectedJobType;
+            if (data.acceptRemarriage) document.getElementById('acceptRemarriage').value = data.acceptRemarriage;
+            if (data.acceptOtherProvince) document.getElementById('acceptOtherProvince').value = data.acceptOtherProvince;
+        }
+
+        // 加载信息库
+        function loadDatabase() {
+            const databaseList = document.getElementById('databaseList');
+            const emptyDatabase = document.getElementById('emptyDatabase');
+            
+            // 清空列表
+            databaseList.innerHTML = '';
+            
+            // 如果没有用户
+            if (allUsers.length === 0) {
+                emptyDatabase.classList.remove('hidden');
+                return;
+            }
+            
+            // 显示用户列表
+            emptyDatabase.classList.add('hidden');
+            
+            // 按姓名排序
+            const sortedUsers = [...allUsers].sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+            
+            sortedUsers.forEach(user => {
+                const age = calculateAge(user.birthDate);
+                const photoHtml = user.photo 
+                    ? `<img src="${user.photo}" alt="${user.name}" class="w-full h-full object-cover">`
+                    : `<i class="fa fa-user text-gray-400 text-2xl"></i>`;
+                
+                const userCard = document.createElement('div');
+                userCard.className = 'bg-white rounded-xl p-3 card-shadow flex items-center cursor-pointer hover:bg-light transition-colors';
+                userCard.innerHTML = `
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mr-3">
+                        ${photoHtml}
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-800">${user.name}</h3>
+                        <p class="text-sm text-gray-600">${age}岁 · ${user.gender} · ${user.job}</p>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                `;
+                
+                userCard.addEventListener('click', () => {
+                    // 设置为当前用户并跳转到个人信息页面
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showPage('profilePage');
+                });
+                
+                databaseList.appendChild(userCard);
+            });
+        }
+
+        // 加载个人信息
+        function loadProfile() {
+            if (!currentUser) {
+                document.getElementById('profileContent').innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-user text-gray-400 text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">暂无个人信息</h3>
+                        <p class="text-gray-500 mb-6">请先完成信息登记</p>
+                        <button onclick="showPage('registerPage')" class="btn-gradient text-white px-6 py-3 rounded-lg font-semibold">
+                            去登记
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const age = calculateAge(currentUser.birthDate);
+            const photoHtml = currentUser.photo 
+                ? `<img src="${currentUser.photo}" alt="${currentUser.name}" class="w-full h-full object-cover">`
+                : `<i class="fa fa-user text-gray-400 text-6xl"></i>`;
+            
+            const loanInfo = currentUser.hasLoan === '有' 
+                ? `<div class="mb-3">
+                    <h4 class="font-semibold text-gray-700 mb-1">贷款情况</h4>
+                    <p class="text-gray-600">房贷月供: ${currentUser.mortgage}元</p>
+                    <p class="text-gray-600">车贷月供: ${currentUser.carLoan}元</p>
+                </div>`
+                : '';
+            
+            document.getElementById('profileTitle').textContent = `${currentUser.name}的信息`;
+            
+            document.getElementById('profileContent').innerHTML = `
+                <div class="bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                        ${photoHtml}
+                    </div>
+                    <div class="p-4">
+                        <div class="text-center mb-4">
+                            <h3 class="text-2xl font-bold text-gray-800">${currentUser.name}</h3>
+                            <p class="text-gray-600">${age}岁 · ${currentUser.gender} · ${currentUser.zodiac} · ${currentUser.maritalStatus}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">基本信息</h3>
+                    <div class="space-y-2 text-gray-600">
+                        <p><span class="font-medium text-gray-700">籍贯:</span> ${currentUser.province} ${currentUser.city} ${currentUser.district}</p>
+                        <p><span class="font-medium text-gray-700">出生日期:</span> ${currentUser.birthDate}</p>
+                        <p><span class="font-medium text-gray-700">身高:</span> ${currentUser.height}cm · 体重: ${currentUser.weight || '未填写'}kg</p>
+                        <p><span class="font-medium text-gray-700">学历:</span> ${currentUser.education}</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">工作与经济</h3>
+                    <div class="space-y-2 text-gray-600">
+                        <p><span class="font-medium text-gray-700">职业:</span> ${currentUser.job}</p>
+                        <p><span class="font-medium text-gray-700">月收入:</span> ${currentUser.income}</p>
+                        <p><span class="font-medium text-gray-700">房产情况:</span> ${currentUser.property || '未填写'}</p>
+                        ${loanInfo}
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">家庭与爱好</h3>
+                    <div class="space-y-2 text-gray-600">
+                        <p><span class="font-medium text-gray-700">父母工作:</span> ${currentUser.parentsJob || '未填写'}</p>
+                        <p><span class="font-medium text-gray-700">爱好特长:</span> ${currentUser.hobbies || '未填写'}</p>
+                        <p><span class="font-medium text-gray-700">原生家庭:</span> ${currentUser.isNuclearFamily}</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 card-shadow">
+                    <h3 class="font-semibold text-gray-800 mb-3">心仪对象要求</h3>
+                    <div class="space-y-2 text-gray-600">
+                        <p><span class="font-medium text-gray-700">年龄:</span> ${currentUser.minAge}-${currentUser.maxAge}岁</p>
+                        <p><span class="font-medium text-gray-700">身高:</span> ${currentUser.expectedHeight || '无要求'}cm以上</p>
+                        <p><span class="font-medium text-gray-700">性格:</span> ${currentUser.expectedPersonality || '无要求'}</p>
+                        <p><span class="font-medium text-gray-700">工作性质:</span> ${currentUser.expectedJobType || '无要求'}</p>
+                        <p><span class="font-medium text-gray-700">接受再婚:</span> ${currentUser.acceptRemarriage}</p>
+                        <p><span class="font-medium text-gray-700">接受外省:</span> ${currentUser.acceptOtherProvince}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成信息卡片
+        function generateInfoCard() {
+            if (!currentUser) {
+                alert('没有可生成卡片的信息');
+                return;
+            }
+            
+            const age = calculateAge(currentUser.birthDate);
+            const photoHtml = currentUser.photo 
+                ? `<img src="${currentUser.photo}" alt="${currentUser.name}" class="w-full h-full object-cover">`
+                : `<i class="fa fa-user text-gray-400 text-5xl"></i>`;
+            
+            // 创建卡片内容
+            document.getElementById('infoCard').innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="w-24 h-24 rounded-full bg-white mx-auto mb-3 overflow-hidden border-4 border-primary flex items-center justify-center">
+                        ${photoHtml}
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary">${currentUser.name}</h2>
+                    <p class="text-gray-600">${age}岁 · ${currentUser.gender} · ${currentUser.zodiac}</p>
+                </div>
+                
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">籍贯:</span>
+                        <span class="font-medium">${currentUser.province}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">身高:</span>
+                        <span class="font-medium">${currentUser.height}cm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">学历:</span>
+                        <span class="font-medium">${currentUser.education}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">职业:</span>
+                        <span class="font-medium">${currentUser.job}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">收入:</span>
+                        <span class="font-medium">${currentUser.income}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">婚姻:</span>
+                        <span class="font-medium">${currentUser.maritalStatus}</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-primary/20 text-center">
+                    <p class="text-primary font-semibold">丽云缘分登记</p>
+                    <p class="text-xs text-gray-500">遇见对的人，共度一生</p>
+                </div>
+            `;
+            
+            // 显示弹窗
+            document.getElementById('cardModal').classList.remove('hidden');
+        }
+
+        // 关闭卡片弹窗
+        function closeCardModal() {
+            document.getElementById('cardModal').classList.add('hidden');
+            currentCardCanvas = null;
+        }
+
+        // 复制卡片到剪贴板
+        function copyCardToClipboard() {
+            const cardElement = document.getElementById('infoCard');
+            
+            html2canvas(cardElement, {
+                backgroundColor: '#fff1f2',
+                scale: 2
+            }).then(canvas => {
+                currentCardCanvas = canvas;
+                
+                // 复制到剪贴板
+                canvas.toBlob(blob => {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        alert('图片已复制到剪贴板！');
+                    }).catch(err => {
+                        alert('复制失败，请尝试下载图片');
+                    });
+                });
+            });
+        }
+
+        // 下载卡片
+        function downloadCard() {
+            const cardElement = document.getElementById('infoCard');
+            
+            html2canvas(cardElement, {
+                backgroundColor: '#fff1f2',
+                scale: 2
+            }).then(canvas => {
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.download = `${currentUser.name}_缘分卡片.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // 加载已保存的数据
+        function loadSavedData() {
+            // 加载当前用户
+            const savedCurrentUser = localStorage.getItem('currentUser');
+            if (savedCurrentUser) {
+                currentUser = JSON.parse(savedCurrentUser);
+            }
+            
+            // 加载所有用户
+            const savedAllUsers = localStorage.getItem('allUsers');
+            if (savedAllUsers) {
+                allUsers = JSON.parse(savedAllUsers);
+            } else {
+                // 添加一些示例数据
+                addSampleData();
+            }
+        }
+
+        // 添加示例数据
+        function addSampleData() {
+            const sampleUsers = [
+                {
+                    id: 'sample1',
+                    photo: null,
+                    name: '张小姐',
+                    gender: '女',
+                    province: '江苏省',
+                    city: '常州市',
+                    district: '金坛区',
+                    maritalStatus: '未婚',
+                    birthDate: '1995-03-15',
+                    zodiac: '猪',
+                    height: '165',
+                    weight: '52',
+                    education: '本科',
+                    job: '教师',
+                    income: '5000-8000',
+                    property: '无房',
+                    hasLoan: '无',
+                    mortgage: 0,
+                    carLoan: 0,
+                    parentsJob: '退休',
+                    hobbies: '阅读、旅行、瑜伽',
+                    isNuclearFamily: '是',
+                    minAge: '25',
+                    maxAge: '35',
+                    expectedHeight: '175',
+                    expectedPersonality: '稳重、有责任心',
+                    expectedJobType: '稳定工作',
+                    acceptRemarriage: '否',
+                    acceptOtherProvince: '否',
+                    registeredAt: new Date().toISOString()
+                },
+                {
+                    id: 'sample2',
+                    photo: null,
+                    name: '李先生',
+                    gender: '男',
+                    province: '江苏省',
+                    city: '常州市',
+                    district: '武进区',
+                    maritalStatus: '未婚',
+                    birthDate: '1992-07-20',
+                    zodiac: '猴',
+                    height: '178',
+                    weight: '70',
+                    education: '本科',
+                    job: '工程师',
+                    income: '12000-20000',
+                    property: '有房有贷',
+                    hasLoan: '有',
+                    mortgage: 3000,
+                    carLoan: 1500,
+                    parentsJob: '企业职工',
+                    hobbies: '运动、摄影、烹饪',
+                    isNuclearFamily: '是',
+                    minAge: '23',
+                    maxAge: '30',
+                    expectedHeight: '160',
+                    expectedPersonality: '开朗、善良',
+                    expectedJobType: '稳定工作',
+                    acceptRemarriage: '否',
+                    acceptOtherProvince: '是',
+                    registeredAt: new Date().toISOString()
+                },
+                {
+                    id: 'sample3',
+                    photo: null,
+                    name: '王女士',
+                    gender: '女',
+                    province: '上海市',
+                    city: '市辖区',
+                    district: '浦东新区',
+                    maritalStatus: '离异',
+                    birthDate: '1988-11-05',
+                    zodiac: '龙',
+                    height: '162',
+                    weight: '55',
+                    education: '硕士',
+                    job: '金融分析师',
+                    income: '20000以上',
+                    property: '有房无贷',
+                    hasLoan: '无',
+                    mortgage: 0,
+                    carLoan: 0,
+                    parentsJob: '大学教授',
+                    hobbies: '艺术、音乐、健身',
+                    isNuclearFamily: '是',
+                    minAge: '30',
+                    maxAge: '40',
+                    expectedHeight: '175',
+                    expectedPersonality: '成熟、稳重、有事业心',
+                    expectedJobType: '企业高管或自主创业',
+                    acceptRemarriage: '是',
+                    acceptOtherProvince: '是',
+                    registeredAt: new Date().toISOString()
+                }
+            ];
+            
+            allUsers = sampleUsers;
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+        }
+
+        // 加载匹配结果
+        function loadMatches() {
+            const matchResults = document.getElementById('matchResults');
+            const noMatches = document.getElementById('noMatches');
+            const matchNavigation = document.getElementById('matchNavigation');
+            
+            // 清空之前的结果
+            matchResults.innerHTML = '';
+            
+            // 如果没有当前用户，显示无匹配
+            if (!currentUser) {
+                noMatches.classList.remove('hidden');
+                matchNavigation.classList.add('hidden');
+                return;
+            }
+            
+            // 计算匹配
+            matches = calculateMatches(currentUser);
+            
+            // 如果没有匹配结果
+            if (matches.length === 0) {
+                noMatches.classList.remove('hidden');
+                matchNavigation.classList.add('hidden');
+                return;
+            }
+            
+            // 显示匹配结果
+            noMatches.classList.add('hidden');
+            
+            // 只显示当前匹配
+            currentMatchIndex = 0;
+            showCurrentMatch();
+            
+            // 显示导航
+            if (matches.length > 1) {
+                matchNavigation.classList.remove('hidden');
+                updateMatchNavigation();
+            } else {
+                matchNavigation.classList.add('hidden');
+            }
+        }
+
+        // 计算匹配
+        function calculateMatches(user) {
+            const results = [];
+            
+            allUsers.forEach(candidate => {
+                // 排除自己
+                if (candidate.id === user.id) return;
+                
+                // 性别匹配：男配女，女配男
+                if (candidate.gender === user.gender) return;
+                
+                // 计算匹配度
+                const matchScore = calculateMatchScore(user, candidate);
+                
+                // 只保留匹配度≥80%的
+                if (matchScore >= 80) {
+                    results.push({
+                        user: candidate,
+                        score: matchScore
+                    });
+                }
+            });
+            
+            // 按匹配度降序排序
+            results.sort((a, b) => b.score - a.score);
+            
+            return results;
+        }
+
+        // 计算匹配分数
+        function calculateMatchScore(user, candidate) {
+            let score = 0;
+            const weights = {
+                age: 30,
+                jobType: 25,
+                remarriage: 20,
+                province: 15,
+                height: 10
+            };
+            
+            // 1. 年龄匹配 (30分)
+            const userAge = calculateAge(user.birthDate);
+            const candidateAge = calculateAge(candidate.birthDate);
+            
+            // 检查用户年龄是否在候选人期望范围内
+            const userInCandidateRange = userAge >= candidate.minAge && userAge <= candidate.maxAge;
+            // 检查候选人年龄是否在用户期望范围内
+            const candidateInUserRange = candidateAge >= user.minAge && candidateAge <= user.maxAge;
+            
+            if (userInCandidateRange && candidateInUserRange) {
+                score += weights.age;
+            } else if (userInCandidateRange || candidateInUserRange) {
+                score += weights.age * 0.5;
+            }
+            
+            // 2. 工作性质匹配 (25分)
+            const userJobKeywords = user.expectedJobType.split(/[、,，]/).filter(k => k.trim());
+            const candidateJobKeywords = candidate.expectedJobType.split(/[、,，]/).filter(k => k.trim());
+            
+            let jobMatch = false;
+            // 检查用户的工作是否符合候选人的期望
+            if (candidateJobKeywords.length > 0) {
+                jobMatch = candidateJobKeywords.some(keyword => 
+                    user.job.includes(keyword.trim())
+                );
+            }
+            
+            // 检查候选人的工作是否符合用户的期望
+            if (userJobKeywords.length > 0) {
+                jobMatch = jobMatch || userJobKeywords.some(keyword => 
+                    candidate.job.includes(keyword.trim())
+                );
+            }
+            
+            // 如果没有设置期望，默认匹配
+            if (userJobKeywords.length === 0 && candidateJobKeywords.length === 0) {
+                jobMatch = true;
+            }
+            
+            if (jobMatch) {
+                score += weights.jobType;
+            }
+            
+            // 3. 是否接受再婚匹配 (20分)
+            const userAccepts = user.acceptRemarriage === '是' || candidate.maritalStatus === '未婚';
+            const candidateAccepts = candidate.acceptRemarriage === '是' || user.maritalStatus === '未婚';
+            
+            if (userAccepts && candidateAccepts) {
+                score += weights.remarriage;
+            }
+            
+            // 4. 是否接受外省匹配 (15分)
+            const sameProvince = user.province === candidate.province;
+            const userAcceptsProvince = user.acceptOtherProvince === '是' || sameProvince;
+            const candidateAcceptsProvince = candidate.acceptOtherProvince === '是' || sameProvince;
+            
+            if (userAcceptsProvince && candidateAcceptsProvince) {
+                score += weights.province;
+            }
+            
+            // 5. 身高匹配 (10分)
+            const userHeight = parseInt(user.height);
+            const candidateHeight = parseInt(candidate.height);
+            const userExpectedHeight = parseInt(user.expectedHeight) || 0;
+            const candidateExpectedHeight = parseInt(candidate.expectedHeight) || 0;
+            
+            const userMeetsHeight = candidateHeight >= userExpectedHeight;
+            const candidateMeetsHeight = userHeight >= candidateExpectedHeight;
+            
+            if (userMeetsHeight && candidateMeetsHeight) {
+                score += weights.height;
+            } else if (userMeetsHeight || candidateMeetsHeight) {
+                score += weights.height * 0.5;
+            }
+            
+            return Math.round(score);
+        }
+
+        // 计算年龄
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        // 显示当前匹配
+        function showCurrentMatch() {
+            const matchResults = document.getElementById('matchResults');
+            const match = matches[currentMatchIndex];
+            
+            matchResults.innerHTML = createMatchCard(match.user, match.score);
+        }
+
+        // 创建匹配卡片
+        function createMatchCard(user, score) {
+            const age = calculateAge(user.birthDate);
+            const photoHtml = user.photo 
+                ? `<img src="${user.photo}" alt="${user.name}" class="w-full h-full object-cover">`
+                : `<i class="fa fa-user text-gray-400 text-5xl"></i>`;
+            
+            return `
+                <div class="bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="relative">
+                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                            ${photoHtml}
+                        </div>
+                        <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            匹配度 ${score}%
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xl font-bold text-gray-800">${user.name}</h3>
+                            <span class="text-gray-600">${age}岁 · ${user.zodiac}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                            <div><i class="fa fa-map-marker text-primary mr-1"></i> ${user.province}</div>
+                            <div><i class="fa fa-ruler-vertical text-primary mr-1"></i> ${user.height}cm</div>
+                            <div><i class="fa fa-graduation-cap text-primary mr-1"></i> ${user.education}</div>
+                            <div><i class="fa fa-briefcase text-primary mr-1"></i> ${user.job}</div>
+                        </div>
+                        <div class="mb-4">
+                            <span class="inline-block bg-accent text-primary px-2 py-1 rounded text-xs mr-2 mb-2">${user.maritalStatus}</span>
+                            <span class="inline-block bg-accent text-primary px-2 py-1 rounded text-xs mr-2 mb-2">${user.income}</span>
+                            <span class="inline-block bg-accent text-primary px-2 py-1 rounded text-xs mr-2 mb-2">${user.property}</span>
+                        </div>
+                        <button onclick="showMatchDetail('${user.id}')" class="w-full bg-white text-primary border border-primary py-2 rounded-lg font-medium hover:bg-light transition-colors">
+                            查看详细资料
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新匹配导航
+        function updateMatchNavigation() {
+            const matchIndicator = document.getElementById('matchIndicator');
+            const prevBtn = document.getElementById('prevMatch');
+            const nextBtn = document.getElementById('nextMatch');
+            
+            matchIndicator.textContent = `${currentMatchIndex + 1}/${matches.length}`;
+            prevBtn.disabled = currentMatchIndex === 0;
+            nextBtn.disabled = currentMatchIndex === matches.length - 1;
+        }
+
+        // 上一个匹配
+        function previousMatch() {
+            if (currentMatchIndex > 0) {
+                currentMatchIndex--;
+                showCurrentMatch();
+                updateMatchNavigation();
+            }
+        }
+
+        // 下一个匹配
+        function nextMatch() {
+            if (currentMatchIndex < matches.length - 1) {
+                currentMatchIndex++;
+                showCurrentMatch();
+                updateMatchNavigation();
+            }
+        }
+
+        // 刷新匹配
+        function refreshMatches() {
+            loadMatches();
+        }
+
+        // 显示匹配详情
+        function showMatchDetail(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            const age = calculateAge(user.birthDate);
+            const photoHtml = user.photo 
+                ? `<img src="${user.photo}" alt="${user.name}" class="w-full h-full object-cover">`
+                : `<i class="fa fa-user text-gray-400 text-6xl"></i>`;
+            
+            const loanInfo = user.hasLoan === '有' 
+                ? `<div class="mb-3">
+                    <h4 class="font-semibold text-gray-700 mb-1">贷款情况</h4>
+                    <p class="text-gray-600">房贷月供: ${user.mortgage}元</p>
+                    <p class="text-gray-600">车贷月供: ${user.carLoan}元</p>
+                </div>`
+                : '';
+            
+            document.getElementById('matchDetailContent').innerHTML = `
+                <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                    ${photoHtml}
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">${user.name}</h3>
+                    <p class="text-gray-600">${age}岁 · ${user.gender} · ${user.zodiac} · ${user.maritalStatus}</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-1">基本信息</h4>
+                        <p class="text-gray-600">籍贯: ${user.province} ${user.city} ${user.district}</p>
+                        <p class="text-gray-600">出生日期: ${user.birthDate}</p>
+                        <p class="text-gray-600">身高: ${user.height}cm · 体重: ${user.weight || '未填写'}kg</p>
+                        <p class="text-gray-600">学历: ${user.education}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-1">工作与经济</h4>
+                        <p class="text-gray-600">职业: ${user.job}</p>
+                        <p class="text-gray-600">月收入: ${user.income}</p>
+                        <p class="text-gray-600">房产情况: ${user.property || '未填写'}</p>
+                        ${loanInfo}
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-1">家庭与爱好</h4>
+                        <p class="text-gray-600">父母工作: ${user.parentsJob || '未填写'}</p>
+                        <p class="text-gray-600">爱好特长: ${user.hobbies || '未填写'}</p>
+                        <p class="text-gray-600">原生家庭: ${user.isNuclearFamily}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-1">心仪对象要求</h4>
+                        <p class="text-gray-600">年龄: ${user.minAge}-${user.maxAge}岁</p>
+                        <p class="text-gray-600">身高: ${user.expectedHeight || '无要求'}cm以上</p>
+                        <p class="text-gray-600">性格: ${user.expectedPersonality || '无要求'}</p>
+                        <p class="text-gray-600">工作性质: ${user.expectedJobType || '无要求'}</p>
+                        <p class="text-gray-600">接受再婚: ${user.acceptRemarriage}</p>
+                        <p class="text-gray-600">接受外省: ${user.acceptOtherProvince}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('matchDetailModal').classList.remove('hidden');
+        }
+
+        // 关闭匹配详情
+        function closeMatchDetail() {
+            document.getElementById('matchDetailModal').classList.add('hidden');
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('matchDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMatchDetail();
+            }
+        });
+
+        // 点击卡片弹窗背景关闭
+        document.getElementById('cardModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCardModal();
+            }
+        });
+    </script>
+</body>
+</html>
