@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>成长日志 | 云端同步</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: linear-gradient(145deg, #f0f2f5 0%, #e6e9ef 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px 12px 30px;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        .hero-section {
+            background: linear-gradient(135deg, #1e293b 0%, #2d3a4f 100%);
+            border-radius: 48px;
+            padding: 20px 18px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .hero-text h1 { font-size: 24px; display: flex; align-items: center; gap: 6px; }
+        .hero-text p { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+        .motivation-img { background: rgba(255,255,255,0.15); border-radius: 60px; padding: 6px 14px; font-size: 28px; display: flex; align-items: center; gap: 6px; }
+        .motivation-img span:last-child { font-size: 12px; background: #facc15; color: #1e293b; padding: 3px 10px; border-radius: 40px; }
+        .journal-card { background: white; border-radius: 32px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
+        .calendar-collapsible { background: white; overflow: hidden; }
+        .calendar-header-bar { display: flex; justify-content: space-between; padding: 14px 18px; cursor: pointer; font-weight: 700; border-bottom: 1px solid #eef2ff; }
+        .calendar-content { padding: 14px; transition: all 0.2s; }
+        .calendar-content.collapsed { display: none; }
+        .calendar-nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+        .month-nav button, .today-cal-btn { background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 36px; cursor: pointer; font-size: 16px; }
+        .current-month { background: #eef2ff; padding: 6px 14px; border-radius: 40px; font-weight: 600; font-size: 14px; }
+        .today-cal-btn { width: auto; padding: 0 14px; font-size: 13px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .cal-weekday { text-align: center; font-size: 11px; font-weight: 600; color: #64748b; padding: 6px 0; }
+        .cal-day { background: #f8fafc; border-radius: 24px; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+        .cal-day.selected-day { background: #3b82f6; color: white; }
+        .cal-day.has-content { background: #e0e7ff; font-weight: 700; }
+        .cal-day.today-highlight { border: 2px solid #f59e0b; }
+        .merged-card { background: #ffffffdd; border-radius: 28px; padding: 16px; margin-top: 6px; border: 1px solid #eef2ff; }
+        .section-title { font-weight: 700; font-size: 15px; margin: 14px 0 8px 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #3b82f6; padding-left: 10px; flex-wrap: wrap; }
+        .zoom-btn { background: #eef2ff; border: none; border-radius: 28px; padding: 3px 10px; font-size: 11px; cursor: pointer; }
+        .growth-tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+        .growth-btn { background: #f1f5f9; border: none; padding: 5px 14px; border-radius: 36px; font-size: 12px; cursor: pointer; }
+        .growth-btn.active-growth { background: #3b82f6; color: white; }
+        .log-entry-item, .done-entry-item { background: #fefce8; border-radius: 20px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #10b981; }
+        .rich-text-content { white-space: pre-wrap; font-size: 13px; line-height: 1.45; }
+        .log-meta { font-size: 10px; color: #6c7a91; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .log-image { max-width: 100%; max-height: 100px; border-radius: 14px; margin-top: 6px; cursor: pointer; }
+        .add-log-panel { background: #f8fafc; border-radius: 20px; padding: 12px; margin-top: 10px; }
+        .flex-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; align-items: center; }
+        .small-icon-btn { background: #e2e8f0; border: none; border-radius: 36px; padding: 5px 12px; font-size: 11px; cursor: pointer; }
+        .todo-list { list-style: none; margin: 6px 0; }
+        .todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
+        .todo-check { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; }
+        .todo-text { flex: 1; font-size: 13px; word-break: break-word; }
+        .todo-text.done { text-decoration: line-through; color: #94a3b8; }
+        .transactions-mini { font-size: 12px; max-height: 220px; overflow-y: auto; }
+        .bill-form-mini { background: #f1f5f9; border-radius: 24px; padding: 12px; margin: 10px 0; }
+        .balance-row { background: #eef2ff; border-radius: 28px; padding: 6px 14px; margin: 8px 0; display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; }
+        .summary-card { background: #f1f5f9; border-radius: 20px; padding: 12px; margin-top: 10px; }
+        .summary-text { white-space: pre-wrap; font-size: 12px; background: white; padding: 10px; border-radius: 16px; margin-top: 5px; max-height: 160px; overflow-y: auto; }
+        .refresh-summary { background: #8b5cf6; color: white; border: none; border-radius: 36px; padding: 5px 10px; font-size: 11px; cursor: pointer; margin-left: 6px; }
+        .mic-btn { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 50px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        .mic-btn.listening { background: #ef4444; color: white; }
+        .type-btn { padding: 5px 10px; border-radius: 36px; font-weight: 600; background: #e2e8f0; cursor: pointer; font-size: 12px; }
+        .type-btn.active-income { background: #d1fae5; color: #065f46; }
+        .type-btn.active-expense { background: #fee2e2; color: #991b1b; }
+        .rich-toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; background: white; padding: 6px 8px; border-radius: 32px; border: 1px solid #e2e8f0; }
+        .tool-btn { background: #f1f5f9; border: none; border-radius: 28px; padding: 3px 8px; font-size: 11px; cursor: pointer; }
+        .rich-textarea { width: 100%; border-radius: 18px; border: 1px solid #e2e8f0; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical; }
+        .fullscreen-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:2000; }
+        .fullscreen-card { background:white; border-radius:40px; width:92%; max-width:700px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; }
+        .fullscreen-header { padding:16px 20px; background:#f8fafc; display:flex; justify-content:space-between; font-weight:700; }
+        .fullscreen-body { flex:1; padding:20px; overflow-y:auto; }
+        .fullscreen-body textarea { width:100%; min-height:250px; font-size:18px; padding:14px; border-radius:24px; border:1px solid #cbd5e1; }
+        .fullscreen-footer { padding:14px 20px; background:#f8fafc; display:flex; justify-content:flex-end; gap:10px; }
+        .catalog-bar { background:#f9fafc; border-radius:28px; padding:8px 12px; margin-bottom:10px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+        .catalog-buttons { display:flex; gap:6px; flex-wrap:wrap; }
+        .catalog-btn { background:transparent; border:1px solid #cbd5e1; border-radius:36px; padding:4px 12px; font-size:11px; cursor:pointer; }
+        .catalog-btn.active-catalog { background:#3b82f6; border-color:#3b82f6; color:white; }
+        .section-card-hidden { display:none !important; }
+        .cloud-bar { background: linear-gradient(135deg, #eef2ff, #e0e7ff); border-radius: 28px; padding: 14px; margin: 12px 0 8px; }
+        .cloud-status { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px; color: #166534; word-break: break-word; }
+        .cloud-input { flex: 1; padding: 8px 10px; border-radius: 28px; border: 1px solid #cbd5e1; font-size: 12px; background: white; }
+        .cloud-btn { background: white; border: 1px solid #cbd5e1; border-radius: 36px; padding: 6px 14px; font-size: 12px; cursor: pointer; }
+        .cloud-btn.primary { background: #3b82f6; border-color: #3b82f6; color: white; }
+        .backup-bar { background: #f1f5f9; border-radius: 28px; padding: 12px; margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+        .footer-note { text-align: center; font-size: 10px; margin-top: 14px; color: #7c8aa0; }
+        button, .zoom-btn, .catalog-btn, .cloud-btn { touch-action: manipulation; }
+        .income-amount { color: #10b981; font-weight: 600; }
+        .expense-amount { color: #ef4444; font-weight: 600; }
+        .record-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eef2ff; }
+        .record-category { font-size: 12px; color: #475569; }
+        .record-note { font-size: 11px; color: #64748b; margin-left: 6px; }
+        .delete-record { background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; padding: 0 4px; }
+        .cloud-note { font-size: 11px; color: #475569; background: #f1f5f9; padding: 6px; border-radius: 16px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero-section">
+        <div class="hero-text"><h1>🌱 成长日志</h1><p>待办 · 已办 · 记账 · 成长</p></div>
+        <div class="motivation-img"><span>🌟</span><span>今日胜昨日</span></div>
+    </div>
+    <div class="journal-card">
+        <div class="calendar-collapsible">
+            <div class="calendar-header-bar" id="calendarCollapseToggle"><span>📅 日历视图</span><span class="collapse-icon" id="collapseIcon">▼</span></div>
+            <div id="calendarContentArea" class="calendar-content">
+                <div class="calendar-nav-area"><div class="month-nav"><button id="prevMonthBtn">←</button><span id="currentMonthDisplay" class="current-month"></span><button id="nextMonthBtn">→</button></div><button id="todayCalBtn" class="today-cal-btn">今天</button></div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+        </div>
+        <div style="padding:0 16px 20px 16px;">
+            <div class="merged-card">
+                <div style="font-weight:700; font-size:17px;" id="selectedDateTitle">——</div>
+                <div style="margin:6px 0;"><span id="festivalDisplay" style="background:#fef3c7; padding:3px 10px; border-radius:28px; font-size:11px;"></span></div>
+                
+                <!-- 云端存储区块 - 增强错误提示 -->
+                <div class="cloud-bar">
+                    <div class="cloud-status" id="cloudStatus">☁️ 未连接云端存储</div>
+                    <div class="flex-row">
+                        <input type="text" id="webdavUrl" class="cloud-input" placeholder="WebDAV 服务器地址 (如: https://dav.jianguoyun.com/dav/)" value="http://localhost:8010/proxy/">
+                        <input type="text" id="webdavUser" class="cloud-input" placeholder="用户名" value="">
+                        <input type="password" id="webdavPass" class="cloud-input" placeholder="应用密码" value="">
+                    </div>
+                    <div class="flex-row" style="margin-top:8px;">
+                        <button id="cloudTestBtn" class="cloud-btn">测试连接</button>
+                        <button id="cloudSaveBtn" class="cloud-btn primary">备份到云端</button>
+                        <button id="cloudLoadBtn" class="cloud-btn">从云端恢复</button>
+                        <button id="cloudClearBtn" class="cloud-btn">清除配置</button>
+                    </div>
+                    <div class="cloud-note">
+                        💡 提示：连接失败常见原因：<br>
+                        1️⃣ 服务器地址不正确（需以 http:// 或 https:// 开头）<br>
+                        2️⃣ 用户名/密码错误<br>
+                        3️⃣ 服务器不支持跨域请求（CORS）- 这是多数公共网盘的通病<br>
+                        4️⃣ 网络问题或服务不可达
+                    </div>
+                </div>
+                
+                <div class="catalog-bar"><span style="font-size:12px;">📑 目录</span><div class="catalog-buttons"><button class="catalog-btn active-catalog" data-target="todoSection">📋 待办</button><button class="catalog-btn active-catalog" data-target="doneSection">✅ 已办</button><button class="catalog-btn active-catalog" data-target="billSection">💰 账单</button><button class="catalog-btn active-catalog" data-target="growthSection">🌱 成长</button><button class="catalog-btn active-catalog" data-target="summarySection">📊 总结</button></div><button class="catalog-reset" id="resetCatalogBtn">全部</button></div>
+
+                <!-- 待办区块 -->
+                <div id="todoSection" class="catalog-section">
+                    <div class="section-title"><span>📋 待办清单</span><button class="zoom-btn" id="todoZoomBtn">🔍 放大</button></div>
+                    <ul id="todoListContainer" class="todo-list"></ul>
+                    <div id="todoInputPanel" class="add-log-panel">
+                        <textarea id="newTodoInput" class="rich-textarea" rows="2" placeholder="新待办..."></textarea>
+                        <div class="flex-row"><button id="addTodoBtn" class="small-icon-btn" style="background:#3b82f6;color:white;">+ 添加</button><button id="voiceTodoBtn" class="mic-btn">🎤</button></div>
+                    </div>
+                </div>
+                
+                <!-- 已办随笔 -->
+                <div id="doneSection" class="catalog-section">
+                    <div class="section-title"><span>✅ 已办随笔</span><button class="zoom-btn" id="doneZoomBtn">🔍 放大</button></div>
+                    <div id="doneEntriesList" style="max-height:260px;overflow-y:auto; margin-bottom:12px;"></div>
+                    <div id="doneInputPanel" class="add-log-panel">
+                        <textarea id="newDoneText" class="rich-textarea" rows="2" placeholder="记录完成事项..."></textarea>
+                        <div class="flex-row"><input id="newDoneLink" placeholder="链接" style="flex:2;"><label class="small-icon-btn">📷图片<input type="file" id="doneImageInput" accept="image/*" style="display:none;"></label><button id="addDoneBtn" class="small-icon-btn" style="background:#10b981;">+ 添加</button></div>
+                        <div class="flex-row"><button id="voiceDoneBtn" class="mic-btn" style="width:auto; padding:4px 12px;">🎤 语音</button></div>
+                        <div id="doneImagePreview"></div>
+                    </div>
+                </div>
+                
+                <!-- 当日账单区块 - 收支记录完整显示 -->
+                <div id="billSection" class="catalog-section">
+                    <div class="section-title">💰 当日账单</div>
+                    <div class="bill-form-mini">
+                        <div class="flex-row"><input type="number" id="quickAmount" placeholder="金额" style="flex:1;"><select id="quickCategory"><option>餐饮</option><option>购物</option><option>交通</option><option>工资</option><option>红包</option></select></div>
+                        <div class="flex-row"><div class="type-buttons"><div id="quickIncomeBtn" class="type-btn active-income">收入</div><div id="quickExpenseBtn" class="type-btn">支出</div></div><input id="quickNote" placeholder="备注" style="flex:2;"><button id="quickMicNoteBtn" class="mic-btn">🎤</button></div>
+                        <button id="quickAddRecordBtn" class="small-icon-btn">+ 记录</button>
+                    </div>
+                    <div id="dayBalanceDisplay" class="balance-row"><span>当日结余</span><span id="dayBalanceValue">¥0.00</span></div>
+                    <div id="dayTransactionsList" class="transactions-mini"></div>
+                </div>
+                
+                <!-- 成长进步 -->
+                <div id="growthSection" class="catalog-section">
+                    <div class="section-title"><span>🌱 成长进步</span><button class="zoom-btn" id="growthZoomBtn">🔍 放大</button></div>
+                    <div class="growth-tabs" id="growthTabs">
+                        <button class="growth-btn active-growth" data-dim="depth">📚 深度</button>
+                        <button class="growth-btn" data-dim="height">⛰️ 高度</button>
+                        <button class="growth-btn" data-dim="temp">🌡️ 温度</button>
+                        <button class="growth-btn" data-dim="width">🌊 宽度</button>
+                    </div>
+                    <div id="logsListContainer" style="max-height:240px;overflow-y:auto; margin-bottom:12px;"></div>
+                    <div id="growthInputPanel" class="add-log-panel">
+                        <textarea id="newLogText" class="rich-textarea" rows="2" placeholder="记录成长..."></textarea>
+                        <div class="flex-row"><input id="newLogLink" placeholder="链接" style="flex:2;"><label class="small-icon-btn">📷图片<input type="file" id="dimImageInput" accept="image/*" style="display:none;"></label><button id="addDimLogBtn" class="small-icon-btn" style="background:#3b82f6;">+ 添加</button></div>
+                        <div class="flex-row"><button id="voiceDimBtn" class="mic-btn" style="width:auto; padding:4px 12px;">🎤 语音</button></div>
+                        <div id="dimImagePreview"></div>
+                    </div>
+                </div>
+                
+                <!-- 智能总结 -->
+                <div id="summarySection" class="catalog-section">
+                    <div class="section-title">📊 智能总结 <button id="refreshSummaryBtn" class="refresh-summary">🔄</button></div>
+                    <div class="summary-card"><div>本周总结</div><div id="weeklySummary" class="summary-text"></div></div>
+                    <div class="summary-card"><div>本月总结</div><div id="monthlySummary" class="summary-text"></div></div>
+                </div>
+                
+                <!-- 本地备份 -->
+                <div class="backup-bar">
+                    <span style="font-size:12px;">💾 本地备份</span>
+                    <div class="flex-row" style="margin-top:0;"><button id="exportDataBtn" class="cloud-btn">📤 导出</button><label class="cloud-btn" style="cursor:pointer;">📥 导入<input type="file" id="importFileInput" accept=".json" style="display:none;"></label><button id="resetDataBtn" class="cloud-btn" style="background:#f59e0b;color:white;">🗑️ 重置</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-note">✨ 放大全屏编辑 | 长按🎤语音 | 云端备份 | 账单自动显示收支明细</div>
+</div>
+
+<script>
+    // 核心数据模型 (无弹窗，账单收支记录完整)
+    const festivals = {"1-1":"元旦","2-14":"情人节","3-8":"妇女节","5-1":"劳动节","6-1":"儿童节","10-1":"国庆节","12-25":"圣诞节"};
+    function getFestival(y,m,d){ return festivals[`${m+1}-${d}`] || null; }
+    let transactions = [], todos = {}, doneEntries = {}, growthLogs = {};
+    let currentGrowth = 'depth';
+    let selectedDate = new Date().toISOString().slice(0,10);
+    let curYear = new Date().getFullYear(), curMonth = new Date().getMonth();
+    
+    function formatYMD(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function getTodayYMD(){ return formatYMD(new Date()); }
+    function saveAll(){ 
+        localStorage.setItem('ledger_t', JSON.stringify(transactions));
+        localStorage.setItem('todos_data', JSON.stringify(todos));
+        localStorage.setItem('done_entries', JSON.stringify(doneEntries));
+        localStorage.setItem('growth_logs', JSON.stringify(growthLogs));
+    }
+    function loadAll(){
+        try { transactions = JSON.parse(localStorage.getItem('ledger_t')||'[]'); } catch(e){ transactions = []; }
+        try { todos = JSON.parse(localStorage.getItem('todos_data')||'{}'); } catch(e){ todos = {}; }
+        try { doneEntries = JSON.parse(localStorage.getItem('done_entries')||'{}'); } catch(e){ doneEntries = {}; }
+        try { growthLogs = JSON.parse(localStorage.getItem('growth_logs')||'{}'); } catch(e){ growthLogs = {}; }
+    }
+    function getTransForDay(ymd){ return transactions.filter(t=>t.dateStr===ymd); }
+    function computeDayBalance(ymd){ let inc=0,exp=0; for(let t of getTransForDay(ymd)) if(t.type==='income') inc+=t.amount; else exp+=t.amount; return inc-exp; }
+    function getExportData(){ return { version:"2.0", exportTime:new Date().toISOString(), transactions, todos, doneEntries, growthLogs }; }
+    function importFullData(data){ if(data.transactions!==undefined) transactions=data.transactions; if(data.todos!==undefined) todos=data.todos; if(data.doneEntries!==undefined) doneEntries=data.doneEntries; if(data.growthLogs!==undefined) growthLogs=data.growthLogs; saveAll(); refreshAllUI(); }
+    
+    // WebDAV 云端 (增强错误处理)
+    let webdavConfig = { url: "", user: "", pass: "" };
+    const CLOUD_FILE = "/growth_log_backup.json";
+    function saveCloudConfig(){ localStorage.setItem('webdav_config', JSON.stringify({ url:webdavConfig.url, user:webdavConfig.user, pass:webdavConfig.pass })); }
+    function loadCloudConfig(){ try{ let c=JSON.parse(localStorage.getItem('webdav_config')||'{}'); if(c.url) webdavConfig=c; document.getElementById('webdavUrl').value=webdavConfig.url; document.getElementById('webdavUser').value=webdavConfig.user; document.getElementById('webdavPass').value=webdavConfig.pass; }catch(e){} }
+    function updateCloudConfigCache(){ webdavConfig.url=document.getElementById('webdavUrl').value; webdavConfig.user=document.getElementById('webdavUser').value; webdavConfig.pass=document.getElementById('webdavPass').value; saveCloudConfig(); }
+    function setCloudStatus(msg, isError=false, isWarning=false){ 
+        let el=document.getElementById('cloudStatus'); 
+        if(el){ 
+            el.innerHTML=msg; 
+            if(isError) el.style.color='#dc2626';
+            else if(isWarning) el.style.color='#f59e0b';
+            else el.style.color='#166534';
+            setTimeout(()=>{ if(!isError && !isWarning) el.style.color=''; },5000);
+        } 
+    }
+    async function webdavRequest(method, path, data=null) {
+        if(!webdavConfig.url || !webdavConfig.user) {
+            throw new Error("请填写完整的WebDAV配置（地址、用户名、密码）");
+        }
+        // 确保URL格式正确
+        let baseUrl = webdavConfig.url.trim();
+        if(!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+            throw new Error("服务器地址必须以 http:// 或 https:// 开头");
+        }
+        const url = baseUrl.replace(/\/$/, '') + path;
+        const headers = { 
+            'Authorization': 'Basic ' + btoa(`${webdavConfig.user}:${webdavConfig.pass}`),
+            'Cache-Control': 'no-cache'
+        };
+        if(data && method !== 'GET') headers['Content-Type'] = 'application/json';
+        
+        const res = await fetch(url, { method, headers, body: data, mode: 'cors' });
+        if(!res.ok && method !== 'GET') {
+            if(res.status === 401) throw new Error("认证失败，请检查用户名和密码");
+            if(res.status === 404) throw new Error("路径不存在，请检查服务器地址是否正确");
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res;
+    }
+    async function testWebDAV(){ 
+        updateCloudConfigCache(); 
+        if(!webdavConfig.url || !webdavConfig.user){ 
+            setCloudStatus('❌ 请填写完整配置（地址、用户名、密码）', true); 
+            return false; 
+        } 
+        setCloudStatus('⏳ 测试连接中...'); 
+        try{ 
+            await webdavRequest('PROPFIND', '/'); 
+            setCloudStatus('✅ 连接成功！云端可用'); 
+            return true; 
+        }catch(e){ 
+            let errMsg = e.message;
+            if(errMsg.includes('Failed to fetch')) errMsg = '网络错误：无法连接到服务器，请检查地址是否正确或网络是否通畅（注意：多数公共网盘不支持浏览器直接连接）';
+            if(errMsg.includes('CORS')) errMsg = 'CORS错误：服务器不支持跨域请求，无法从浏览器直接访问';
+            setCloudStatus(`❌ 连接失败: ${errMsg}`, true); 
+            return false; 
+        } 
+    }
+    async function backupToCloud(){ 
+        if(!await testWebDAV()) return; 
+        setCloudStatus('⏳ 上传备份中...'); 
+        try{ 
+            const data = JSON.stringify(getExportData(), null, 2);
+            await webdavRequest('PUT', CLOUD_FILE, data); 
+            setCloudStatus('✅ 备份成功！'); 
+        }catch(e){ 
+            setCloudStatus(`❌ 备份失败: ${e.message}`, true); 
+        } 
+    }
+    async function restoreFromCloud(){ 
+        if(!await testWebDAV()) return; 
+        setCloudStatus('⏳ 下载恢复中...'); 
+        try{ 
+            const res = await webdavRequest('GET', CLOUD_FILE); 
+            const json = await res.json(); 
+            if(json && (json.transactions || json.todos)){ 
+                importFullData(json); 
+                setCloudStatus('✅ 恢复成功！数据已更新'); 
+            } else throw new Error('云端文件格式错误'); 
+        }catch(e){ 
+            setCloudStatus(`❌ 恢复失败: ${e.message}`, true); 
+        } 
+    }
+    
+    // 渲染辅助
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    function renderMarkdown(text){ if(!text) return ''; let h = escapeHtml(text); h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>'); h = h.replace(/^- (.*$)/gm, '<li>$1</li>'); if(h.includes('<li>')) h = '<ul>'+h+'</ul>'; return h; }
+    function renderRichContent(text){ return `<div class="rich-text-content">${renderMarkdown(text)}</div>`; }
+    
+    function refreshAllUI(){ refreshDay(selectedDate); renderCalendar(); generateSummaries(); }
+    function refreshDay(ymd){ 
+        document.getElementById('selectedDateTitle').innerHTML=`📅 ${ymd}`; 
+        const fest=getFestival(parseInt(ymd.split('-')[0]), parseInt(ymd.split('-')[1])-1, parseInt(ymd.split('-')[2])); 
+        document.getElementById('festivalDisplay').innerText=fest?`🎉 ${fest}`:'';
+        // 待办渲染
+        const todoList=todos[ymd]||[]; 
+        const todoContainer=document.getElementById('todoListContainer'); 
+        todoContainer.innerHTML=!todoList.length?'<li style="color:#94a3b8;">✨ 暂无待办</li>':todoList.map(t=>`<li class="todo-item"><input type="checkbox" class="todo-check" ${t.done?'checked':''} data-id="${t.id}"><div class="todo-text ${t.done?'done':''}">${renderMarkdown(t.text)}</div><button class="edit-todo" data-id="${t.id}">✏️</button><button class="delete-todo" data-id="${t.id}">🗑️</button></li>`).join('');
+        attachTodoEvents(ymd);
+        // 已办渲染
+        const doneList=doneEntries[ymd]||[]; 
+        const doneContainer=document.getElementById('doneEntriesList'); 
+        doneContainer.innerHTML=!doneList.length?'<div style="padding:12px;">✨ 暂无已办</div>':doneList.map(e=>`<div class="done-entry-item">${renderRichContent(e.text)}${e.link?`<div class="log-meta">🔗 <a href="${escapeHtml(e.link)}" target="_blank">链接</a></div>`:''}${e.imageData?`<img src="${e.imageData}" class="log-image">`:''}<div class="log-meta"><span>🕒 ${new Date(e.timestamp).toLocaleTimeString()}</span><button class="edit-done" data-id="${e.id}">✏️</button><button class="delete-done" data-id="${e.id}">🗑️</button></div></div>`).join('');
+        attachDoneEvents(ymd);
+        // 账单渲染 - 完整显示收入和支出记录
+        const trans=getTransForDay(ymd); 
+        const transDiv=document.getElementById('dayTransactionsList'); 
+        if(trans.length===0){ transDiv.innerHTML='<div style="padding:10px;color:#94a3b8;text-align:center;">📭 暂无账单记录</div>'; }
+        else{ transDiv.innerHTML=trans.map(t=>`<div class="record-item"><div><span class="record-category">${t.category}</span>${t.note?`<span class="record-note">- ${escapeHtml(t.note)}</span>`:''}</div><div><span class="${t.type==='income'?'income-amount':'expense-amount'}">${t.type==='income'?'+':'-'}¥${t.amount.toFixed(2)}</span><button class="delete-record" data-id="${t.id}">🗑️</button></div></div>`).join(''); 
+        }
+        document.querySelectorAll('.delete-record').forEach(btn=>{ btn.addEventListener('click',()=>{ transactions=transactions.filter(t=>t.id!==parseInt(btn.dataset.id)); saveAll(); refreshDay(ymd); renderCalendar(); generateSummaries(); }); });
+        const balance=computeDayBalance(ymd); 
+        const balSpan=document.getElementById('dayBalanceValue'); 
+        balSpan.innerText=`${balance>=0?'+':'-'}¥${Math.abs(balance).toFixed(2)}`; 
+        balSpan.style.color=balance>=0?'#10b981':'#ef4444';
+        renderGrowthLogs(ymd); 
+        generateSummaries();
+    }
+    function attachTodoEvents(ymd){ document.querySelectorAll('.todo-check').forEach(cb=>{ cb.addEventListener('change',(e)=>{ const id=parseInt(cb.dataset.id); toggleTodoDone(ymd,id,cb.checked); }); }); document.querySelectorAll('.delete-todo').forEach(btn=>{ btn.addEventListener('click',()=>{ const id=parseInt(btn.dataset.id); deleteTodoItem(ymd,id); }); }); document.querySelectorAll('.edit-todo').forEach(btn=>{ const id=parseInt(btn.dataset.id); const item=todos[ymd]?.find(t=>t.id===id); if(item){ let newText=prompt('编辑',item.text); if(newText && newText.trim()){ item.text=newText.trim(); saveAll(); refreshDay(ymd); } } }); }
+    function toggleTodoDone(ymd,id,done){ let list=todos[ymd]||[]; const idx=list.findIndex(t=>t.id===id); if(idx!==-1){ list[idx].done=done; todos[ymd]=list; saveAll(); refreshDay(ymd); renderCalendar(); } }
+    function deleteTodoItem(ymd,id){ let list=todos[ymd]||[]; list=list.filter(t=>t.id!==id); todos[ymd]=list; saveAll(); refreshDay(ymd); renderCalendar(); }
+    function addTodo(ymd, text){ if(!text.trim()) return; const list=todos[ymd]||[]; list.push({id:Date.now(), text:text.trim(), done:false}); todos[ymd]=list; saveAll(); refreshDay(ymd); renderCalendar(); }
+    function attachDoneEvents(ymd){ document.querySelectorAll('.delete-done').forEach(btn=>{ btn.addEventListener('click',()=>{ const id=parseInt(btn.dataset.id); if(doneEntries[ymd]){ doneEntries[ymd]=doneEntries[ymd].filter(e=>e.id!==id); if(!doneEntries[ymd].length) delete doneEntries[ymd]; saveAll(); refreshDay(ymd); renderCalendar(); } }); }); document.querySelectorAll('.edit-done').forEach(btn=>{ const id=parseInt(btn.dataset.id); const entry=doneEntries[ymd]?.find(e=>e.id===id); if(entry){ let newText=prompt('编辑',entry.text); if(newText!==null){ entry.text=newText.trim()||''; saveAll(); refreshDay(ymd); } } }); }
+    function addDoneEntry(ymd, text, link, imageData){ if(!text.trim() && !link && !imageData) return; if(!doneEntries[ymd]) doneEntries[ymd]=[]; doneEntries[ymd].unshift({ id:Date.now(), text:text.trim(), link:link?.trim()||'', imageData:imageData||'', timestamp:Date.now() }); saveAll(); refreshDay(ymd); renderCalendar(); document.getElementById('newDoneText').value=''; document.getElementById('newDoneLink').value=''; document.getElementById('doneImagePreview').innerHTML=''; }
+    function renderGrowthLogs(ymd){ const container=document.getElementById('logsListContainer'); const logsObj=growthLogs[ymd] || { depth:[], height:[], temp:[], width:[] }; const logs=logsObj[currentGrowth]||[]; if(!logs.length){ container.innerHTML='<div style="padding:12px;">✨ 暂无成长记录</div>'; return; } container.innerHTML=logs.map(log=>`<div class="log-entry-item">${renderRichContent(log.text)}${log.link?`<div class="log-meta">🔗 <a href="${escapeHtml(log.link)}" target="_blank">链接</a></div>`:''}${log.imageData?`<img src="${log.imageData}" class="log-image">`:''}<div class="log-meta"><span>🕒 ${new Date(log.timestamp).toLocaleTimeString()}</span><button class="edit-growth" data-id="${log.id}">✏️</button><button class="delete-growth" data-id="${log.id}">🗑️</button></div></div>`).join(''); attachGrowthEvents(ymd); }
+    function attachGrowthEvents(ymd){ document.querySelectorAll('.delete-growth').forEach(btn=>{ btn.onclick=()=>{ const id=parseInt(btn.dataset.id); if(growthLogs[ymd]?.[currentGrowth]){ growthLogs[ymd][currentGrowth]=growthLogs[ymd][currentGrowth].filter(l=>l.id!==id); if(Object.values(growthLogs[ymd]).every(arr=>!arr.length)) delete growthLogs[ymd]; saveAll(); renderGrowthLogs(ymd); renderCalendar(); } } }); document.querySelectorAll('.edit-growth').forEach(btn=>{ const id=parseInt(btn.dataset.id); const log=growthLogs[ymd]?.[currentGrowth]?.find(l=>l.id===id); if(log){ let newText=prompt('编辑',log.text); if(newText!==null){ log.text=newText.trim()||''; saveAll(); renderGrowthLogs(ymd); renderCalendar(); } } }); }
+    function addGrowthLog(ymd, dim, text, link, imageData){ if(!text.trim()) return; if(!growthLogs[ymd]) growthLogs[ymd]={ depth:[], height:[], temp:[], width:[] }; growthLogs[ymd][dim].unshift({ id:Date.now(), text:text.trim(), link:link?.trim()||'', imageData:imageData||'', timestamp:Date.now() }); saveAll(); renderGrowthLogs(ymd); renderCalendar(); document.getElementById('newLogText').value=''; document.getElementById('newLogLink').value=''; document.getElementById('dimImagePreview').innerHTML=''; }
+    
+    function renderCalendar(){ const firstDay=new Date(curYear,curMonth,1).getDay(), days=new Date(curYear,curMonth+1,0).getDate(), today=getTodayYMD(); let grid=''; for(let w of ['日','一','二','三','四','五','六']) grid+=`<div class="cal-weekday">${w}</div>`; for(let d=1;d<=days;d++){ let ymd=formatYMD(new Date(curYear,curMonth,d)); let has=!!(todos[ymd]?.length||doneEntries[ymd]?.length||getTransForDay(ymd).length||growthLogs[ymd]); let cls=`cal-day ${has?'has-content':''} ${ymd===selectedDate?'selected-day':''} ${ymd===today?'today-highlight':''}`; grid+=`<div class="${cls}" data-ymd="${ymd}"><div>${d}</div></div>`; } document.getElementById('calendarGrid').innerHTML=grid; document.getElementById('currentMonthDisplay').innerText=`${curYear}年${curMonth+1}月`; document.querySelectorAll('.cal-day[data-ymd]').forEach(el=>el.onclick=()=>{ selectedDate=el.dataset.ymd; renderCalendar(); refreshDay(selectedDate); }); }
+    
+    // 智能总结 (无弹窗)
+    function generateSummaries(){
+        const today = new Date();
+        const currentYear = today.getFullYear(), currentMonth = today.getMonth();
+        const dayOfWeek = today.getDay();
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        let weekIncome = 0, weekExpense = 0, weekTodosCount = 0, weekDonesCount = 0;
+        for(let d = new Date(monday); d <= sunday; d.setDate(d.getDate() + 1)){
+            const ymd = formatYMD(d);
+            const dayTrans = getTransForDay(ymd);
+            for(let t of dayTrans){
+                if(t.type === 'income') weekIncome += t.amount;
+                else weekExpense += t.amount;
+            }
+            if(todos[ymd]) weekTodosCount += todos[ymd].length;
+            if(doneEntries[ymd]) weekDonesCount += doneEntries[ymd].length;
+        }
+        const startMonth = new Date(currentYear, currentMonth, 1);
+        const endMonth = new Date(currentYear, currentMonth + 1, 0);
+        let monthIncome = 0, monthExpense = 0, monthTodosCount = 0, monthDonesCount = 0;
+        for(let d = new Date(startMonth); d <= endMonth; d.setDate(d.getDate() + 1)){
+            const ymd = formatYMD(d);
+            const dayTrans = getTransForDay(ymd);
+            for(let t of dayTrans){
+                if(t.type === 'income') monthIncome += t.amount;
+                else monthExpense += t.amount;
+            }
+            if(todos[ymd]) monthTodosCount += todos[ymd].length;
+            if(doneEntries[ymd]) monthDonesCount += doneEntries[ymd].length;
+        }
+        document.getElementById('weeklySummary').innerText = `📆 ${formatYMD(monday)} ~ ${formatYMD(sunday)}\n💰 收入:¥${weekIncome.toFixed(2)} 支出:¥${weekExpense.toFixed(2)} 结余:¥${(weekIncome-weekExpense).toFixed(2)}\n📋 待办:${weekTodosCount}项 ✅ 已办:${weekDonesCount}项`;
+        document.getElementById('monthlySummary').innerText = `📅 ${currentYear}年${currentMonth+1}月\n💰 收入:¥${monthIncome.toFixed(2)} 支出:¥${monthExpense.toFixed(2)} 结余:¥${(monthIncome-monthExpense).toFixed(2)}\n📋 待办:${monthTodosCount}项 ✅ 已办:${monthDonesCount}项`;
+    }
+    
+    // 语音识别
+    async function requestMicrophonePermission(){ if(!('webkitSpeechRecognition' in window)) return false; try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); stream.getTracks().forEach(t=>t.stop()); return true; }catch(e){ return false; } }
+    class VoiceRecognizer{ constructor(){ this.recognition=null; this.isListening=false; this.onResult=null; } async start(onResult){ if(!('webkitSpeechRecognition' in window)) return false; if(this.isListening) return false; if(!await requestMicrophonePermission()) return false; const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition; this.recognition=new SpeechRecognition(); this.recognition.continuous=true; this.recognition.interimResults=false; this.recognition.lang='zh-CN'; let buf=''; this.onResult=onResult; this.recognition.onresult=(e)=>{ for(let i=e.resultIndex;i<e.results.length;i++) if(e.results[i].isFinal) buf+=e.results[i][0].transcript; if(buf&&this.onResult){ this.onResult(buf); buf=''; } }; this.recognition.onend=()=>{ this.isListening=false; }; try{ this.recognition.start(); this.isListening=true; return true; }catch(e){ return false; } } stop(){ if(this.recognition&&this.isListening) try{ this.recognition.stop(); }catch(e){} this.isListening=false; this.recognition=null; } }
+    function attachLongPressVoice(btnId,onResult){ const btn=document.getElementById(btnId); if(!btn) return; let rec=null, timer=null, pressed=false; const start=async()=>{ if(rec?.isListening) return; rec=new VoiceRecognizer(); if(await rec.start((txt)=>{ if(onResult) onResult(txt); })) btn.classList.add('listening'); else rec=null; }; const stop=()=>{ if(rec){ rec.stop(); rec=null; } btn.classList.remove('listening'); }; const onStart=(e)=>{ e.preventDefault(); if(pressed) return; pressed=true; timer=setTimeout(start,80); }; const onEnd=()=>{ if(timer) clearTimeout(timer); if(pressed){ pressed=false; stop(); } }; btn.addEventListener('mousedown',onStart); btn.addEventListener('mouseup',onEnd); btn.addEventListener('mouseleave',onEnd); btn.addEventListener('touchstart',onStart,{passive:false}); btn.addEventListener('touchend',onEnd); btn.addEventListener('touchcancel',onEnd); }
+    function attachTapVoice(btnId,onResult){ const btn=document.getElementById(btnId); if(!btn) return; let rec=null; btn.addEventListener('click',async()=>{ if(rec?.isListening) return; rec=new VoiceRecognizer(); if(await rec.start((txt)=>{ if(onResult) onResult(txt); rec=null; })){ btn.classList.add('listening'); setTimeout(()=>{ if(rec?.isListening){ rec.stop(); btn.classList.remove('listening'); rec=null; } },8000); }else rec=null; }); }
+    
+    let quickType='income';
+    document.getElementById('quickIncomeBtn').onclick=()=>{ quickType='income'; document.getElementById('quickIncomeBtn').classList.add('active-income'); document.getElementById('quickExpenseBtn').classList.remove('active-expense'); };
+    document.getElementById('quickExpenseBtn').onclick=()=>{ quickType='expense'; document.getElementById('quickExpenseBtn').classList.add('active-expense'); document.getElementById('quickIncomeBtn').classList.remove('active-income'); };
+    function addQuickRecord(){ 
+        let amt = parseFloat(document.getElementById('quickAmount').value); 
+        if(isNaN(amt) || amt <= 0){ return; } 
+        const cat = document.getElementById('quickCategory').value; 
+        const note = document.getElementById('quickNote').value.trim(); 
+        const now = new Date(); 
+        const ymd = formatYMD(now); 
+        transactions.push({ id:Date.now(), amount:amt, type:quickType, category:cat, note, dateStr:ymd, dateDisplay:`${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}`, timestamp:now.getTime() }); 
+        saveAll(); 
+        document.getElementById('quickAmount').value = ''; 
+        document.getElementById('quickNote').value = ''; 
+        if(selectedDate === ymd) refreshDay(selectedDate); 
+        else{ renderCalendar(); if(selectedDate === ymd) refreshDay(selectedDate); } 
+        generateSummaries(); 
+    }
+    
+    // 初始化
+    function init(){
+        loadAll(); loadCloudConfig(); renderCalendar();
+        document.getElementById('prevMonthBtn').onclick=()=>{ curMonth--; if(curMonth<0){ curMonth=11; curYear--; } renderCalendar(); };
+        document.getElementById('nextMonthBtn').onclick=()=>{ curMonth++; if(curMonth>11){ curMonth=0; curYear++; } renderCalendar(); };
+        document.getElementById('todayCalBtn').onclick=()=>{ const t=new Date(); curYear=t.getFullYear(); curMonth=t.getMonth(); selectedDate=getTodayYMD(); renderCalendar(); refreshDay(selectedDate); };
+        document.getElementById('addTodoBtn').onclick=()=>{ const txt=document.getElementById('newTodoInput').value; if(txt.trim()){ addTodo(selectedDate,txt); document.getElementById('newTodoInput').value=''; } };
+        attachLongPressVoice('voiceTodoBtn',(txt)=>{ const ta=document.getElementById('newTodoInput'); ta.value=ta.value+(ta.value?'\n'+txt:txt); });
+        attachLongPressVoice('voiceDoneBtn',(txt)=>{ const ta=document.getElementById('newDoneText'); ta.value=ta.value+(ta.value?'\n'+txt:txt); });
+        attachLongPressVoice('voiceDimBtn',(txt)=>{ const ta=document.getElementById('newLogText'); ta.value=ta.value+(ta.value?'\n'+txt:txt); });
+        attachTapVoice('quickMicNoteBtn',(txt)=>{ document.getElementById('quickNote').value=txt; });
+        document.getElementById('addDoneBtn').onclick=()=>{ addDoneEntry(selectedDate, document.getElementById('newDoneText').value, document.getElementById('newDoneLink').value, window._tmpDoneImg||''); window._tmpDoneImg=null; };
+        const doneFile=document.getElementById('doneImageInput'); doneFile.onchange=e=>{ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>{ window._tmpDoneImg=ev.target.result; document.getElementById('doneImagePreview').innerHTML='✅ 图片已选'; }; r.readAsDataURL(f); } };
+        document.querySelector('label[for="doneImageInput"]')?.addEventListener('click',()=>doneFile.click());
+        document.querySelectorAll('#growthTabs .growth-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('#growthTabs .growth-btn').forEach(b=>b.classList.remove('active-growth')); btn.classList.add('active-growth'); currentGrowth=btn.dataset.dim; renderGrowthLogs(selectedDate); }); });
+        document.getElementById('addDimLogBtn').onclick=()=>{ addGrowthLog(selectedDate, currentGrowth, document.getElementById('newLogText').value, document.getElementById('newLogLink').value, window._tmpDimImg||''); window._tmpDimImg=null; };
+        const dimFile=document.getElementById('dimImageInput'); dimFile.onchange=e=>{ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>{ window._tmpDimImg=ev.target.result; document.getElementById('dimImagePreview').innerHTML='✅ 图片已选'; }; r.readAsDataURL(f); } };
+        document.getElementById('quickAddRecordBtn').addEventListener('click',addQuickRecord);
+        document.getElementById('refreshSummaryBtn').addEventListener('click',()=>{ generateSummaries(); });
+        document.getElementById('calendarCollapseToggle').onclick=()=>{ isCollapsed=!isCollapsed; document.getElementById('calendarContentArea').classList.toggle('collapsed',isCollapsed); document.getElementById('collapseIcon').innerHTML=isCollapsed?'▶':'▼'; if(!isCollapsed) renderCalendar(); };
+        
+        const resetBtn=document.getElementById('resetCatalogBtn'); const btns=document.querySelectorAll('.catalog-btn'); const updateVis=()=>{ document.querySelectorAll('.catalog-section').forEach(sec=>{ const btn=document.querySelector(`.catalog-btn[data-target="${sec.id}"]`); if(btn&&btn.classList.contains('active-catalog')) sec.classList.remove('section-card-hidden'); else sec.classList.add('section-card-hidden'); }); }; btns.forEach(btn=>btn.addEventListener('click',()=>{ btn.classList.toggle('active-catalog'); updateVis(); })); resetBtn.addEventListener('click',()=>{ btns.forEach(b=>b.classList.add('active-catalog')); updateVis(); }); updateVis();
+        
+        document.getElementById('todoZoomBtn').onclick=()=>{ let val=document.getElementById('newTodoInput').value; let newVal=prompt('编辑内容',val); if(newVal!==null) document.getElementById('newTodoInput').value=newVal; };
+        document.getElementById('doneZoomBtn').onclick=()=>{ let val=document.getElementById('newDoneText').value; let newVal=prompt('编辑内容',val); if(newVal!==null) document.getElementById('newDoneText').value=newVal; };
+        document.getElementById('growthZoomBtn').onclick=()=>{ let val=document.getElementById('newLogText').value; let newVal=prompt('编辑内容',val); if(newVal!==null) document.getElementById('newLogText').value=newVal; };
+        
+        document.getElementById('exportDataBtn').onclick=()=>{ let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(getExportData(),null,2)])); a.download=`成长日志_${getTodayYMD()}.json`; a.click(); };
+        document.getElementById('importFileInput').onchange=e=>{ if(e.target.files[0]){ let r=new FileReader(); r.onload=ev=>{ try{ importFullData(JSON.parse(ev.target.result)); }catch(err){} }; r.readAsText(e.target.files[0]); e.target.value=''; } };
+        document.getElementById('resetDataBtn').onclick=()=>{ if(confirm('删除所有数据？')){ transactions=[]; todos={}; doneEntries={}; growthLogs={}; saveAll(); refreshAllUI(); } };
+        
+        document.getElementById('cloudTestBtn').onclick=testWebDAV;
+        document.getElementById('cloudSaveBtn').onclick=backupToCloud;
+        document.getElementById('cloudLoadBtn').onclick=restoreFromCloud;
+        document.getElementById('cloudClearBtn').onclick=()=>{ webdavConfig={url:"",user:"",pass:""}; saveCloudConfig(); document.getElementById('webdavUrl').value=""; document.getElementById('webdavUser').value=""; document.getElementById('webdavPass').value=""; setCloudStatus('🗑️ 已清除配置'); };
+        document.getElementById('webdavUrl').onchange=updateCloudConfigCache;
+        document.getElementById('webdavUser').onchange=updateCloudConfigCache;
+        document.getElementById('webdavPass').onchange=updateCloudConfigCache;
+        
+        refreshDay(selectedDate);
+    }
+    let isCollapsed=false;
+    init();
+</script>
+</body>
+</html>
