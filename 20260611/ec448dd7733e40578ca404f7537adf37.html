@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>输送带计算器·极简版</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Helvetica, sans-serif;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+        .box {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px 18px 30px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            margin: 0 0 6px 0;
+            text-align: center;
+        }
+        .sub {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #555;
+            margin-bottom: 24px;
+        }
+        .field {
+            margin-bottom: 18px;
+        }
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 14px;
+            box-sizing: border-box;
+            background: white;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus {
+            border-color: #6366f1;
+        }
+        .row2 {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .row2 .field {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        button {
+            background: #eef2ff;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #e0e7ff;
+        }
+        .coeff-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 30px;
+            margin: 15px 0 20px;
+            flex-wrap: wrap;
+        }
+        .result {
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-top: 18px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .value {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #1e293b;
+        }
+        .note {
+            font-size: 0.7rem;
+            color: #4b5563;
+            margin-top: 18px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .reset-btn {
+            background: #fff;
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>📐 带芯计算器</h2>
+    <div class="sub">胶面厚度 / 布层 / 带宽 → 平方数</div>
+
+    <div class="field">
+        <label>📌 胶面厚度 (mm)</label>
+        <input type="number" min="0" id="rubber" value="7.5" step="0.5">
+    </div>
+
+    <div class="field">
+        <label>🧩 布层数</label>
+        <input type="number" min="0" id="ply" value="4" step="1">
+    </div>
+
+    <div class="field">
+        <label>📏 带宽 (mm)</label>
+        <input type="number" min="0" id="width" value="800" step="50">
+    </div>
+
+    <div class="row2">
+        <div class="field">
+            <label>💰 单价 (元/基数)</label>
+            <input type="number" min="0" id="price" value="120" step="5">
+        </div>
+        <div class="field">
+            <label>⚖️ 重量系数</label>
+            <input type="number" min="0" id="coeff" value="1.7" step="0.01">
+        </div>
+    </div>
+
+    <div class="coeff-bar">
+        <span>⚡ 快速调节系数</span>
+        <div>
+            <button id="subCoeff">−0.05</button>
+            <button id="addCoeff">+0.05</button>
+            <button id="resetCoeff">重置1.7</button>
+        </div>
+    </div>
+
+    <div class="result">
+        <div class="result-item">
+            <span>📐 平方数</span>
+            <span class="value" id="dataVal">0.00</span>
+        </div>
+        <div class="result-item">
+            <span>💵 总价</span>
+            <span class="value" id="totalPrice">0.00 元</span>
+        </div>
+        <div class="result-item">
+            <span>🏋️ 重量</span>
+            <span class="value" id="totalWeight">0.00 kg</span>
+        </div>
+    </div>
+
+    <button id="resetAll" class="reset-btn">🔄 恢复默认值</button>
+    <div class="note">
+        ※ 平方数 = (胶面/1.5 + 布层) × 带宽<br>
+        总价 = 平方数 × 单价 &nbsp;&nbsp; 重量 = 平方数 × 系数
+    </div>
+</div>
+
+<script>
+(function(){
+    const rubberInput = document.getElementById('rubber');
+    const plyInput = document.getElementById('ply');
+    const widthInput = document.getElementById('width');
+    const priceInput = document.getElementById('price');
+    const coeffInput = document.getElementById('coeff');
+
+    const dataSpan = document.getElementById('dataVal');
+    const priceSpan = document.getElementById('totalPrice');
+    const weightSpan = document.getElementById('totalWeight');
+
+    // 获取合法数值
+    function getVal(el, def = 0) {
+        let v = parseFloat(el.value);
+        return isNaN(v) ? def : Math.max(v, 0);
+    }
+
+    // 核心计算
+    function update() {
+        const rubber = getVal(rubberInput);
+        const ply = getVal(plyInput);
+        const width = getVal(widthInput);
+        const price = getVal(priceInput);
+        const coeff = getVal(coeffInput, 1.7);
+
+        let square = width === 0 ? 0 : (rubber / 1.5 + ply) * width;
+        let totalPrice = square * price;
+        let totalWeight = square * coeff;
+
+        dataSpan.innerText = square.toFixed(2);
+        priceSpan.innerText = totalPrice.toFixed(2) + ' 元';
+        weightSpan.innerText = totalWeight.toFixed(2) + ' kg';
+    }
+
+    // 绑定输入事件
+    function bindEvent() {
+        [rubberInput, plyInput, widthInput, priceInput, coeffInput]
+            .forEach(el => el.addEventListener('input', update));
+
+        // 系数减0.05
+        document.getElementById('subCoeff').addEventListener('click', () => {
+            let val = getVal(coeffInput, 1.7) - 0.05;
+            coeffInput.value = Math.max(val, 0).toFixed(2);
+            update();
+        });
+        // 系数加0.05
+        document.getElementById('addCoeff').addEventListener('click', () => {
+            let val = getVal(coeffInput, 1.7) + 0.05;
+            coeffInput.value = val.toFixed(2);
+            update();
+        });
+        // 重置系数
+        document.getElementById('resetCoeff').addEventListener('click', () => {
+            coeffInput.value = '1.70';
+            update();
+        });
+        // 全部重置
+        document.getElementById('resetAll').addEventListener('click', () => {
+            rubberInput.value = '7.5';
+            plyInput.value = '4';
+            widthInput.value = '800';
+            priceInput.value = '120';
+            coeffInput.value = '1.70';
+            update();
+        });
+    }
+
+    // 失焦补全空值
+    function blurFix() {
+        const inputs = [rubberInput, plyInput, widthInput, priceInput, coeffInput];
+        inputs.forEach(inp => {
+            inp.addEventListener('blur', () => {
+                if (inp.value === '' || isNaN(parseFloat(inp.value))) {
+                    inp.value = '0';
+                }
+                update();
+            });
+        });
+    }
+
+    // 初始化
+    update();
+    bindEvent();
+    blurFix();
+})();
+</script>
+</body>
+</html>
