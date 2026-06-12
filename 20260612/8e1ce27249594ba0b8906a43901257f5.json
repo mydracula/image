@@ -1,0 +1,80 @@
+{
+  "info": {
+    "time": 1781176544522,
+    "version": "2.0"
+  },
+  "data": {
+    "sys_settings": [],
+    "apiConfig": [],
+    "globalSettings": [],
+    "contacts": [],
+    "chats": [],
+    "messages": [],
+    "friendGroups": [
+      {
+        "name": "ALL.",
+        "icon": "",
+        "iconColor": "",
+        "badge": "",
+        "isActive": true,
+        "id": 1
+      },
+      {
+        "name": "Likes",
+        "icon": "fa-solid fa-heart",
+        "iconColor": "#e5e5ea",
+        "badge": "",
+        "isActive": false,
+        "id": 2
+      },
+      {
+        "name": "Friends#",
+        "icon": "fa-regular fa-heart",
+        "iconColor": "",
+        "badge": "",
+        "isActive": false,
+        "id": 3
+      },
+      {
+        "name": "Family",
+        "icon": "fa-solid fa-heart",
+        "iconColor": "#8e8e93",
+        "badge": "",
+        "isActive": false,
+        "id": 4
+      }
+    ],
+    "momentsPosts": [],
+    "momentsComments": [],
+    "sharedMemos": [],
+    "momentsLikes": [],
+    "worldBooks": [],
+    "wbGroups": [
+      {
+        "id": 1,
+        "name": "默认分组"
+      }
+    ],
+    "charTemplates": [],
+    "musicLibrary": [],
+    "userStickers": [],
+    "memories": [],
+    "diaries": [],
+    "momentsGroups": [],
+    "momentsAlbums": [],
+    "momentsPhotos": [],
+    "stickerGroups": [
+      {
+        "id": 1,
+        "name": "默认分组"
+      }
+    ],
+    "walletRecords": [],
+    "stickers": [],
+    "apiPresets": [],
+    "stylePresets": [],
+    "meetSaves": [],
+    "forumPosts": [],
+    "schedules": []
+  }
+}
