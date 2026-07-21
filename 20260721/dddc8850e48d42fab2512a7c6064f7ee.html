@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>上海杉达学院生存指南</title>
+    <style>
+        :root {
+            --primary-color: #1F4E78;
+            --accent-color: #C00000;
+            --sub-color: #2E75B6;
+            --bg-light: #F2F5F8;
+            --text-dark: #333333;
+            --text-muted: #666666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: var(--text-dark); background-color: #f7f9fa; line-height: 1.6; }
+
+        header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; padding: 0 16px; z-index: 100; }
+        .menu-btn { background: none; border: none; font-size: 16px; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; font-weight: bold; }
+        .menu-btn svg { margin-right: 6px; }
+        .nav-title { margin-left: 16px; font-size: 16px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 199; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        .drawer { position: fixed; top: 0; left: 0; width: 80%; max-width: 320px; height: 100%; background: #ffffff; z-index: 200; transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 2px 0 8px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+        .drawer.active { transform: translateX(0); }
+        .drawer-header { padding: 24px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; }
+        .book-cover { width: 65px; height: 85px; background: linear-gradient(135deg, #e6f0fa, #b9d3ee); border-radius: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 6px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-right: 14px; }
+        .book-cover .title-mini { font-size: 10px; font-weight: bold; color: var(--primary-color); }
+        .book-cover .sub-mini { font-size: 6px; color: var(--text-muted); transform: scale(0.8); }
+        .header-meta h2 { font-size: 18px; color: #000; margin-bottom: 4px; }
+        .header-meta p { font-size: 12px; color: #666666; font-weight: 500; }
+        .drawer-subheader { display: flex; justify-content: space-between; padding: 14px 20px 8px 20px; font-size: 13px; color: var(--text-muted); font-weight: bold; }
+        .menu-list { overflow-y: auto; flex: 1; padding: 10px 0 30px 0; }
+        .menu-part-title { font-size: 14px; font-weight: bold; color: #3194a0; padding: 12px 20px 6px 20px; }
+        .menu-item { display: block; padding: 10px 20px; color: var(--text-dark); text-decoration: none; font-size: 14px; transition: background 0.2s; }
+        .menu-item:hover, .menu-item.active { background-color: #f5f5f5; color: var(--primary-color); font-weight: bold; }
+
+        .container { max-width: 720px; margin: 56px auto 0 auto; background-color: #ffffff; padding: 24px 16px; min-height: calc(100vh - 56px); }
+        .main-title { font-size: 24px; color: var(--primary-color); text-align: center; margin: 16px 0 32px 0; font-weight: bold; }
+        .part-divider { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 6px; margin: 40px 0 20px 0; font-size: 20px; font-weight: bold; }
+        .chapter-section { margin-bottom: 36px; scroll-margin-top: 70px; }
+        .chapter-title { font-size: 18px; color: var(--primary-color); margin: 24px 0 14px 0; font-weight: bold; border-left: 4px solid var(--primary-color); padding-left: 10px; }
+        .sub-title { font-size: 15px; color: var(--sub-color); margin: 16px 0 8px 0; font-weight: bold; }
+        p { font-size: 14px; color: var(--text-dark); text-align: justify; margin-bottom: 12px; text-indent: 2em; }
+        p.no-indent, ul p { text-indent: 0; }
+
+        .tip-box { background-color: var(--bg-light); border-radius: 8px; padding: 14px 16px; margin: 16px 0; }
+        .tip-title { font-weight: bold; color: var(--primary-color); font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; }
+        .tip-content { font-size: 13px; color: #444444; list-style-type: none; }
+        .tip-content li { margin-bottom: 4px; position: relative; padding-left: 14px; }
+        .tip-content li::before { content: "•"; position: absolute; left: 0; color: var(--primary-color); font-weight: bold; }
+
+        ul { list-style: none; padding-left: 0; margin-bottom: 16px; }
+        .bullet-item { position: relative; padding-left: 16px; margin-bottom: 10px; text-align: justify; }
+        .bullet-item::before { content: "▪"; position: absolute; left: 0; color: var(--sub-color); }
+
+        .download-btn { display: inline-flex; align-items: center; justify-content: center; background-color: #2E75B6; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; margin: 15px 0; box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: background 0.2s; }
+        .download-btn:hover { background-color: #1F4E78; }
+        .download-btn svg { margin-right: 8px; }
+
+        .price-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13.5px; }
+        .price-table th, .price-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .price-table th { background-color: var(--bg-light); color: var(--primary-color); font-weight: bold; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-card { background: #ffffff; width: 85%; max-width: 340px; border-radius: 16px; padding: 24px 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.8); transition: transform 0.3s ease; position: relative; }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+        .modal-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #2E75B6, #1F4E78); color: white; font-size: 24px; font-weight: bold; line-height: 60px; border-radius: 50%; margin: 0 auto 12px auto; box-shadow: 0 4px 10px rgba(31,78,120,0.3); }
+        .modal-card h3 { font-size: 18px; color: var(--primary-color); margin-bottom: 8px; }
+        .modal-card p { text-indent: 0; text-align: center; font-size: 14px; color: #555555; margin-bottom: 16px; }
+        .wx-box { background: #F4F6F9; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 16px; font-weight: bold; color: #222222; margin-bottom: 16px; border: 1px dashed #b9d3ee; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .copy-btn { background: var(--primary-color); color: #ffffff; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: background 0.2s; }
+        
+        .close-modal-btn { position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 26px; color: #aaaaaa; cursor: pointer; line-height: 1; padding: 8px; z-index: 1010; }
+        footer { text-align: center; padding: 30px 16px; color: var(--text-muted); font-size: 12px; background-color: #ffffff; border-top: 1px solid #eeeeee; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <!-- 微信弹窗 -->
+    <div class="modal-overlay active" id="wxModal">
+        <div class="modal-card">
+            <button class="close-modal-btn" onclick="closeModal()">×</button>
+            <div class="modal-avatar">泽</div>
+            <h3>不懂的可以咨询阿泽学长</h3>
+            <p>阿泽学长亲自为您解答上海杉达学院所有的入学疑问和校园生活指南~</p>
+            <div class="wx-box"><span id="wxId">sanda_aze1</span></div>
+            <button class="copy-btn" id="copyBtn" onclick="copyWeChat()">点击一键复制微信号</button>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <header>
+        <button class="menu-btn" onclick="toggleDrawer()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            目录
+        </button>
+        <div class="nav-title">上海杉达学院生存指南</div>
+    </header>
+
+    <!-- 抽屉菜单 -->
+    <div class="drawer-overlay" id="overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <div class="book-cover">
+                <div class="title-mini">杉达学院</div>
+                <div class="title-mini">生存指南</div>
+                <div class="sub-mini">新生入学全攻略</div>
+            </div>
+            <div class="header-meta">
+                <h2>上海杉达学院</h2>
+                <p>阿泽学长亲笔编写 · 独家求学经历与生存避坑分享</p>
+            </div>
+        </div>
+        <div class="drawer-subheader"><span>目录</span><span>全景新指南</span></div>
+        <div class="menu-list">
+            <div class="menu-part-title">篇章I·入学参考</div>
+            <a href="#zx-01" class="menu-item" onclick="closeDrawer()">01 学校概览</a>
+            <a href="#zx-02" class="menu-item" onclick="closeDrawer()">02 宿舍攻略</a>
+            <a href="#zx-03" class="menu-item" onclick="closeDrawer()">03 食堂美食</a>
+            <a href="#zx-04" class="menu-item" onclick="closeDrawer()">04 校园消费</a>
+            <div class="menu-part-title">篇章II·进阶指南</div>
+            <a href="#rx-01" class="menu-item" onclick="closeDrawer()">01 学生会与社团</a>
+            <a href="#rx-02" class="menu-item" onclick="closeDrawer()">02 专业课表</a>
+            <a href="#rx-03" class="menu-item" onclick="closeDrawer()">03 绩点与证书</a>
+            <a href="#rx-04" class="menu-item" onclick="closeDrawer()">04 奖学兼职防骗</a>
+            <div class="menu-part-title">篇章III·致谢</div>
+            <a href="#zx-thanks" class="menu-item" onclick="closeDrawer()">01 致谢与寄语</a>
+        </div>
+    </div>
+
+    <!-- 主体内容区域 -->
+    <div class="container">
+        <h1 class="main-title">上海杉达学院生存指南<br><span style="font-size:14px; font-weight:normal; color:#666;">新生入学全攻略与求学核心指南</span></h1>
+        <p class="no-indent" style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">自学长学姐的分享，难免主观、也可能过时。当朋友的经验听，决策请以学校官方信息为准。</p>
+
+        <!-- 地图区域 -->
+        <div style="width: 100%; margin-bottom: 30px;">
+            <div style="font-size: 15px; font-weight: bold; color: var(--primary-color); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+                本校区地图如下：
+            </div>
+            <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #fff;">
+                <img src="图片路径" alt="上海杉达学院地图" style="width: 100%; height: auto; display: block;">
+            </div>
+        </div>
+
+        <div class="part-divider">篇章 I · 入学参考</div>
+        
+        <div class="chapter-section" id="zx-01">
+            <div class="chapter-title">01 学校概览：应用型的高校定位</div>
+            <p>上海杉达学院创办于1992年，是经教育部批准设立的全日制民办普通本科高校，也是全国首批民办本科院校之一。学校坚持应用型人才培养，设有多个二级学院，涵盖经济、管理、文学、工学、艺术、教育等多个学科门类，为学生提供丰富的专业选择和实践机会。</p>
+        </div>
+
+        <div class="chapter-section" id="zx-02">
+            <div class="chapter-title">02 宿舍攻略：环境配置与管理规则</div>
+            <div class="tip-box">
+                <div class="tip-title">📌 划重点</div>
+                <ul class="tip-content">
+                    <li>全校上床下桌布局，每层楼配公共淋浴间和公共卫生间</li>
+                    <li>门禁时间 22:30，严查大功率发热违禁电器</li>
+                    <li>步行效率高，教学楼与食堂都在 5-8 分钟日常生活圈内</li>
+                </ul>
+            </div>
+            <div class="sub-title">1. 宿舍环境与配置</div>
+            <p>上海杉达学院宿舍整体以上床下桌布局为主，每位同学都有独立的学习和休息空间。宿舍采光较好，每间宿舍均配备阳台，方便晾晒衣物。每层楼都设有公共淋浴间以及公共卫生间。</p>
+            <p>宿舍内提供上床下桌、独立衣柜、书桌、书架和阳台。床铺尺寸（新老寝一致）统一为 90cm × 190cm。你可以自行网购无杆床帘（强烈推荐）、床垫和收纳用品。⚠️ 特别提醒：不建议安装桌子护边床帘，因为宿舍内部空间有限，会明显影响到室内的日常活动。</p>
+            <div class="sub-title">2. 宿舍管理与出行</div>
+            <p>宿舍实行统一管理。熄灯时间通常以宿舍室友共同协商为主；男女寝室的深夜门禁时间均为 22:30，宿管查寝时间也一般安排在 22:30 左右。为了校园安全，学校不允许在宿舍内配备和存放电动车。不过校园整体步行效率很高，宿舍到教学楼只需 5–8 分钟，宿舍到食堂约 4–6 分钟，步行完全能够满足日常学习和生活需求。</p>
+            <div class="sub-title">3. 严查违禁电器清单</div>
+            <p>为了用电安全，宿舍内部以下发热类电器严格禁止使用：**电饭煲、电磁炉、宿舍小锅、冰箱、卷发棒等大功率电器**。一经查出会被宿管暂存并扣除操行分。</p>
+        </div>
+
+        <div class="chapter-section" id="zx-03">
+            <div class="chapter-title">03 食堂美食：窗口分布与价格参考</div>
+            <p class="no-indent">嘉善校区食堂位于学生生活动中心旁，步行即可快速到达宿舍、教学楼，是同学们日常堂食就餐的主要阵地。</p>
+            <div class="sub-title">1. 核心食堂窗口分布</div>
+            <ul>
+                <li class="bullet-item"><strong>一楼大众与特色档口：</strong> 面粉天地、老上海风味、营养早餐、天天快餐、一勺香盖饭、东南亚风味、滋滋石锅坊、匠心卤味、杨国福麻辣烫、铁膳坊、水饺馄饨、真乐堡汉堡、风味小馆以及全天候面包房。</li>
+                <li class="bullet-item"><strong>二楼精致特色餐饮：</strong> 港式糖水铺、0090汉堡工厂、经典过桥米线、原盅煲仔饭、瓦罐热卤拌饭、江南面馆、木桶饭等。</li>
+            </ul>
+            <div class="sub-title">2. 消费餐标价格参考</div>
+            <table class="price-table">
+                <thead><tr><th>类型</th><th>餐标价格参考区间</th></tr></thead>
+                <tbody>
+                    <tr><td>营养早餐</td><td>约 0.5 ～ 6 元</td></tr>
+                    <tr><td>快餐正餐</td><td>约 10 ～ 17 元</td></tr>
+                    <tr><td>特色窗口/小锅</td><td>约 7 ～ 28 元</td></tr>
+                    <tr><td>休闲奶茶/面包</td><td>约 3 ～ 13 元</td></tr>
+                </tbody>
+            </table>
+            <div class="sub-title">3. 统一营业时间表</div>
+            <p class="no-indent">💡 早餐：06:30—10:00 ｜ 午餐：10:00—12:30 ｜ 晚餐：16:00—17:30 ｜ 特色小吃窗口：07:00—21:00。</p>
+            <div class="sub-title">4. 食堂周边的便利生活圈</div>
+            <p>除了吃饭，生活配套也很方便。食堂二楼有糖水铺，一楼设有面包房。此外，在浙江超市内可一站式购买新鲜水果、零食和日用品。学生活动中心对面配有独立书书店，其一楼更是学生服务大厅，日常办事动线极佳。</p>
+        </div>
+
+        <div class="chapter-section" id="zx-04">
+            <div class="chapter-title">04 校园消费：月度生活费与菜鸟驿站</div>
+            <div class="sub-title">1. 三档生活费预算参考</div>
+            <ul>
+                <li class="bullet-item"><strong>1000元/月（平价平稳档）：</strong> 适合日常基本在食堂吃快餐，极少点外卖、不进行高频校外聚餐。参考分配为三餐约700元、日用品150元、交通话费100元、零花50元。</li>
+                <li class="bullet-item"><strong>2000元/月（大多数同学推荐档）：</strong> 能够过得比较舒适。参考分配为常规三餐约1000元、奶茶水果200元、网购衣服300元、校外聚餐社交300元、交通通讯200元。</li>
+                <li class="bullet-item"><strong>3000元/月+（丰富拓展档）：</strong> 消费较为自由。参考分配为三餐加外卖约1300元、服饰网购600元、周末探店或周边游500元、奶茶零食300元、日常交通话费300元。</li>
+            </ul>
+            <div class="sub-title">2. 收发快递驿站</div>
+            <p class="no-indent">全校快递统一集中在**南门停车场菜鸟驿站**。网购时标准收货地址请务必填写：<br><strong>浙江省嘉兴市嘉善县人民大道505号 上海杉达学院嘉善光彪学院南门菜鸟驿站</strong></p>
+        </div>
+
+        <div class="part-divider">篇章 II · 进阶指南</div>
+
+        <div class="chapter-section" id="rx-01">
+            <div class="chapter-title">01 学生会与社团：组织选择与综测评优</div>
+            <div class="tip-box">
+                <div class="tip-title">📌 核心避坑建议</div>
+                <ul class="tip-content">
+                    <li>学生组织加社团总数建议克制在 1-2 个以内，盲目多报极度透支精力</li>
+                    <li>社团和干事经历必须要完成组织考核、积极出勤才可获得最终的综测加分</li>
+                </ul>
+            </div>
+            <p>大学是培养兴趣、提升能力、结交朋友的重要阶段。加入一个适合自己的学生组织或社团，不仅能丰富大学生活，还能锻炼沟通、组织、策划等综合能力。建议新生选择 1～2 个真正感兴趣的组织长期参与。</p>
+            <div class="sub-title">1. 学校主流学生组织架构</div>
+            <p>学校设有多个校级、院级学生组织，主要包括：**团委学生会、社团联合会、学生艺术教育中心、宿管会、各二级学院学生会、各学院团委部门**。不同组织负责校园活动策划、宣传运营、志愿服务、文艺活动、学生管理等工作。</p>
+            <div class="sub-title">2. 学生组织三大核心热门部门</div>
+            <ul>
+                <li class="bullet-item"><strong>宣传部（技术网媒）：</strong> 负责海报设计、公众号运营、摄影摄像、新媒体内容制作等。适合喜欢摄影、网页推文编写、视频剪辑以及使用 PS 搞设计的同学。</li>
+                <li class="bullet-item"><strong>办公室（综合行政）：</strong> 主要负责内部文件整理、大型活动统筹策划、会议记录记载、学生组织财务报销等日常行政工作。适合细心、责任心强的同学。</li>
+                <li class="bullet-item"><strong>组织部（团青基建）：</strong> 主要负责日常团员管理、基层团日活动推进、全校志愿服务调配以及组织协调。适合沟通能力较强、有责任心的同学。</li>
+            </ul>
+            <div class="sub-title">3. 四大类亮点兴趣社团推荐</div>
+            <p class="no-indent">📊 <strong>体育运动类：</strong> 篮球社、足球社、羽毛球社、乒乓球协会、校园夜跑社、轮滑社等。<br>🎭 <strong>文艺兴趣类：</strong> 吉他社、舞蹈社、摄影社、动漫配音社、汉服社、晋风书画社。<br>🧠 <strong>学术技能类：</strong> 创新创业协会、计算机协会、酒店文化协会。<br>❤️ <strong>公益成长类：</strong> 青年志愿者协会、心理社、木兰社。</p>
+            <div class="sub-title">4. 社团干事对综测评优的实际帮助</div>
+            <p>积极参与学生组织和社团活动，在期末通过考核后，有机会获得**综测操行加分、志愿服务时长记录、精美荣誉证书、优秀学生干部评选资格**，这在奖学金评审、入党推优中具有综合参考加成。但前提是必须切实完成工作，挂名旷工无法获得通过。</p>
+        </div>
+
+        <div class="chapter-section" id="rx-02">
+            <div class="chapter-title">02 专业课表：上课节奏与查看入口</div>
+            <div class="sub-title">1. 一周课程时间与节奏分配</div>
+            <p>大学课程整体比较灵活，常规课程主要集中在周一至周四，周五课程通常相对较少，周末一般没有常规教学安排。每天课程通常分为上午、下午两个时段，中午有充足的休息时间。</p>
+            <p>大多数专业每周约有 **3～4 天面临早八课程**，主要高频集中在周一至周三。其中医学、外语等专业课程相对最密集、排课最紧凑，实验课多；商科类理论课多；艺术类实践创作课多，课表也最为灵活。全校晚课整体较少，多为实验或实践课，期末复习阶段一般不安排晚课。公共必修包含思政理论课、大学英语、大学体育、计算机基础、军事理论、心理健康等。</p>
+            <div class="sub-title">2. 课表节点与单双周看懂指南</div>
+            <p class="no-indent">▪ 1–2 节：早八课程 ｜ 3–4 节：上午后半段 ｜ 5–8 节：下午课程 ｜ 9–12 节：晚课。<br>▪ 课表中标注的“单周”代表仅奇数周上课；“双周”代表仅偶数周上课；“2–16周”表示该课程在该区间周次内滚动上课。</p>
+            <div class="sub-title">3. 专业课表下载</div>
+            <p>阿泽学长已为你一站式整理并打包了各专业的完整课表，点击下方按钮即可直接调取：</p>
+            
+            <p class="no-indent" style="text-align: center;">
+                <a href="这里填写下载路径" class="download-btn" download>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    点击一键下载各专业课表.xlsx
+                </a>
+            </p>
+        </div>
+
+        <div class="chapter-section" id="rx-03">
+            <div class="chapter-title">03 绩点与证书：学业管理与考证节奏</div>
+            <p>学校主要参考平均学分绩点（GPA）和平均学分成绩。高学分的专业核心必修课期末考砸，会对你的绩点产生毁灭性打击。绩点的高低直接死卡学业奖学金、评优、以及后续如果面临跨校考研复试时的表现。大一必须稳住，不要指望大三大四去拔高。</p>
+            <div class="sub-title">1. 期中期末考试与挂科重修</div>
+            <p>大部分通识人文课只有期末考试；但是**高等数学、大学英语**等分值极高的公共硬核课，会硬性排有期中考试，拉分很明显。如果期末不幸挂科未通过，开学初需及时参加学校安排的补考。如果补考再次挂掉，则必须在系统交费申请重新跟班上课的“重修”，重修通过才会置换学分。</p>
+            <div class="sub-title">2. 核心考证黄金节奏划分</div>
+            <ul>
+                <li class="bullet-item"><strong>必考项（⭐⭐⭐⭐⭐）：英语四级（CET-4）。</strong> 强烈建议大一第一学期趁着高考词汇底子最热的时候直接报名考掉，越往后拖通过率越低。四级考过后有余力接着冲六级。</li>
+                <li class="bullet-item"><strong>推荐项（⭐⭐⭐⭐）：全国计算机等级考试（NCRE）。</strong> 推荐报考一级 WPS Office 或一级计算机基础，对后续大学里写论文排版、做活动策划案、充实简历基本任职要求极其有帮助。</li>
+                <li class="bullet-item"><strong>方向项（⭐⭐⭐）：专业进阶证书。</strong> 包含普通话等级证书（师范教育类必考）、教师资格证等，大二大三根据具体的职业生涯规划进行补充长线备考。</li>
+            </ul>
+        </div>
+
+        <div class="chapter-section" id="rx-04">
+            <div class="chapter-title">04 奖学金、综测、兼职与防骗安全</div>
+            <div class="sub-title">1. 各档奖学金金额标准一览</div>
+            <p>学业奖学金严格参考期末的首次正考绩点排名加综测。挂科违纪者一票否决。</p>
+            <table class="price-table">
+                <thead><tr><th>奖项名称</th><th>本科层次奖励金额</th><th>专科层次奖励金额</th></tr></thead>
+                <tbody>
+                    <tr><td>🏆 校长奖学金</td><td>10000 元/年</td><td>5000 元/年</td></tr>
+                    <tr><td>🥇 特等奖学金</td><td colspan="2" style="text-align:center;">3000 元/年</td></tr>
+                    <tr><td>🥈 一等奖学金</td><td colspan="2" style="text-align:center;">1800 元/年</td></tr>
+                    <tr><td>🥉 二等奖学金</td><td colspan="2" style="text-align:center;">1200 元/年</td></tr>
+                    <tr><td>🎖️ 三等奖学金</td><td colspan="2" style="text-align:center;">900 元/年</td></tr>
+                </tbody>
+            </table>
+            <div class="sub-title">2. 综合素质测评（综测）构成</div>
+            <p>综测是评奖的另一杆秤。由德育、智育、体育、美育、劳动、创新能力**等多维度细则构成。成绩是不可动摇的大基石，学生干部经历、大型比赛获奖、志愿服务时长则是让你在班级排名中脱颖而出的核心加分项。</p>
+            <div class="sub-title">3. 校内勤工助学兼职安全渠道</div>
+            <p class="no-indent">校内兼职环境纯粹且安全。常见四大官方途径：<br>① 食堂帮工窗口岗位（由辅导员在班群转发）；② 学校统一发布的校外直属勤工助学助管平台（如各大指定酒店）；③ 辅导员处报名的校内直属行政助理助理岗位；④ <strong>杉苑生活服务平台：</strong> 纯校内服务项目，工时结算透明，时间高度灵活，赚取零花钱首选。</p>
+            <div class="sub-title">4. 新生最高频遭遇的防骗安全防线</div>
+            <p>大一入校时属于各类诈骗高发期，请务必提高警惕，死守不转账底线。⚠️ <strong>重点绕开以下高频骗局：</strong> 宿舍流窜的低价假冒校园卡/电话卡推销；网络上的兼职刷单返利（凡是让你先垫钱的100%是诈骗）；所谓的交钱进老生群买考试内幕资料；冒充学长姐在楼道推销高价劣质床品被褥；二手平台交易要求不走官方平台先私下付款；校外技能培训机构诱导办理大额分期网络贷款；以及冒充辅导员老师微信紧急收费。遇到任何钱财问题，先打辅导员或96110反诈求助。</p>
+        </div>
+
+        <div class="part-divider">篇章 III · 致谢</div>
+        
+        <div class="chapter-section" id="zx-thanks">
+            <div class="chapter-title">01 致谢与寄语</div>
+            <p>因为大家的真实分享，这份指南才有温度。这份指南由阿泽学长结合自己在上海杉达学院的求学经历和多方避坑心得亲笔编写而成。它并不完美，但它之所以能够成形，是因为希望能为每一个即将来到杉达、素不相识的学弟学妹搭一把手，抹平新环境里初来乍到的信息差。</p>
+            <p>正是这些曾经真实走过的弯路、踩过的坑和收获的快乐，构成了这份指南最重要的价值，也让这些宝贵经验能够转化为人与人之间的善意与温度。</p>
+            <p>也感谢每一位打开、阅读和使用这份指南的人。你或许是正在为孩子升学做准备的家长，也或许是刚刚结束高考、即将走进大学的同学。真诚希望，这份还不完美的指南，能够陪你走过有些忐忑、又充满未知与期待的新阶段。</p>
+            <p>少一点信息差，少一点慌张；多一点底气，也多一点对新生活的期待。学弟学妹们，加油！</p>
+        </div>
+    </div>
+
+    <footer>
+        <p class="no-indent">© 上海杉达学院求学生存指南 · 由阿泽学长亲笔编写</p>
+    </footer>
+
+    <script>
+    function toggleDrawer() { 
+        document.getElementById('drawer').classList.toggle('active'); 
+        document.getElementById('overlay').classList.toggle('active'); 
+    }
+    function closeDrawer() { 
+        document.getElementById('drawer').classList.remove('active'); 
+        document.getElementById('overlay').classList.remove('active'); 
+    }
+    function closeModal() { 
+        document.getElementById('wxModal').classList.remove('active'); 
+    }
+
+    // 修复后的复制微信号逻辑（解决页面下滚问题）
+    function copyWeChat() { 
+        const text = document.getElementById('wxId').innerText; 
+        const btn = document.getElementById('copyBtn'); 
+
+        // 1. 优先使用 Modern Clipboard API（零滚动、体验极佳）
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopySuccess(btn);
+            }).catch(() => {
+                fallbackCopy(text, btn);
+            });
+        } else {
+            // 2. 兼容性降级处理（固定在页面顶部左外侧，防止焦点导致页面滚动）
+            fallbackCopy(text, btn);
+        }
+    }
+
+    // 降级兼容逻辑
+    function fallbackCopy(text, btn) {
+        const input = document.createElement('textarea'); 
+        input.value = text; 
+
+        // 防止页面滚动的关键样式：
+        input.style.position = 'fixed';
+        input.style.top = '0';
+        input.style.left = '-9999px';
+        input.style.opacity = '0';
+
+        document.body.appendChild(input); 
+        input.focus();
+        input.select(); 
+
+        try { 
+            document.execCommand('copy'); 
+            showCopySuccess(btn);
+        } catch(e) { 
+            alert('复制失败，请长按手动复制'); 
+        } 
+        document.body.removeChild(input); 
+    }
+
+    // 提示复制成功与关闭弹窗
+    function showCopySuccess(btn) {
+        btn.innerText = '✅ 复制成功！快去微信添加吧'; 
+        setTimeout(() => { 
+            btn.innerText = '点击一键复制微信号'; 
+            closeModal(); 
+        }, 1500); 
+    }
+
+    // 滚动监听高亮菜单
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('.chapter-section'); 
+        const menuItems = document.querySelectorAll('.menu-item');
+        let current = ''; 
+        sections.forEach(s => { 
+            if (window.pageYOffset >= s.offsetTop - 120) current = s.getAttribute('id'); 
+        });
+        menuItems.forEach(m => { 
+            m.classList.remove('active'); 
+            if (m.getAttribute('href') === '#' + current) m.classList.add('active'); 
+        });
+    });
+</script>
+</body>
+</html>
