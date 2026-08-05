@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>墨字集 · 字体批量预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e9eef5 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', 'SF Pro Text', 'Inter', Roboto, Helvetica, sans-serif;
+            padding: 1.2rem;
+            color: #0a1120;
+            overflow-x: hidden;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1480px;
+            width: 100%;
+            margin: 0 auto;
+            overflow-x: hidden;
+            padding: 0 0.2rem;
+        }
+
+        /* 工具栏卡片 */
+        .toolbar {
+            background: rgba(255,255,255,0.96);
+            border-radius: 2rem;
+            padding: 1.6rem 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 12px 28px -8px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid rgba(203, 213, 225, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        h1 {
+            font-size: clamp(1.6rem, 6vw, 2rem);
+            font-weight: 650;
+            letter-spacing: -0.01em;
+            background: linear-gradient(130deg, #1E2A3E, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sub {
+            color: #3a4a6e;
+            margin: 0.5rem 0 1.2rem 0;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            font-size: 0.85rem;
+            font-weight: 450;
+            opacity: 0.85;
+        }
+
+        /* 上传区域 */
+        .upload-zone {
+            background: #fefdf7;
+            border: 2px dashed #bac8dc;
+            border-radius: 1.8rem;
+            padding: 1.3rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 1.2rem;
+        }
+        .upload-zone:hover {
+            background: #faf8f0;
+            border-color: #3b82f6;
+            transform: scale(0.99);
+        }
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 0.4rem;
+        }
+        .upload-zone p:first-of-type {
+            font-weight: 530;
+            color: #1e2a44;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1.2rem 0 0.8rem;
+        }
+        .btn {
+            padding: 0.5rem 1.4rem;
+            border-radius: 3rem;
+            border: none;
+            background: white;
+            font-weight: 520;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            border: 1px solid #dce3ec;
+        }
+        .btn-outline {
+            background: #ffffff;
+            border-color: #cbd5e1;
+        }
+        .btn-outline:hover {
+            background: #eef2ff;
+            border-color: #3b82f6;
+        }
+
+        .stats-badge {
+            background: #1e2f44;
+            color: #eef4ff;
+            padding: 0.3rem 1rem;
+            border-radius: 3rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* ========= 重新设计的全局预览控制栏 — 预览文本两排 + 字号数值融合 ========= */
+        .control-bar {
+            background: #ffffff;
+            border-radius: 1.6rem;
+            padding: 1.2rem 1.4rem;
+            margin-top: 0.6rem;
+            border: 1px solid #e9eef3;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            font-weight: 540;
+            font-size: 0.85rem;
+            color: #2c3e66;
+            padding-left: 0.2rem;
+        }
+        .preview-header span {
+            background: #eef2ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 450;
+        }
+
+        /* 灵活双栏布局：预览文本区（上下结构） + 字号区（水平紧凑） */
+        .preview-control-grid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 1.5rem;
+            row-gap: 1rem;
+        }
+
+        /* 预览文本容器 — 上下两排结构，优雅可滚动 */
+        .text-group {
+            flex: 2;
+            min-width: 240px;
+            background: #f9fbfe;
+            border-radius: 1.5rem;
+            padding: 0.9rem 1rem;
+            transition: all 0.2s;
+            border: 1px solid #e9edf2;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .text-group:focus-within {
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+        }
+
+        .text-label-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .text-icon {
+            font-size: 1.1rem;
+            color: #3b82f6;
+            background: #eef2ff;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .text-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e2f4e;
+            letter-spacing: -0.2px;
+        }
+
+        /* 可滚动多行文本框 — 支持上下滑动 */
+        #previewTextInput {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #0a1120;
+            resize: vertical;
+            outline: none;
+            overflow-y: auto;
+            max-height: 110px;
+            min-height: 65px;
+            padding: 0.2rem 0;
+            scrollbar-width: thin;
+        }
+        #previewTextInput::-webkit-scrollbar {
+            width: 5px;
+            background: #eef2ff;
+            border-radius: 10px;
+        }
+        #previewTextInput::-webkit-scrollbar-thumb {
+            background: #b9c8f0;
+            border-radius: 10px;
+        }
+
+        /* 字号调节容器 — 清爽水平，数值融合不突出 */
+        .size-group {
+            flex: 1.1;
+            min-width: 210px;
+            background: #f9fbfe;
+            border-radius: 1.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9edf2;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .size-group:focus-within {
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+        }
+        .size-icon {
+            font-size: 1rem;
+            color: #3b82f6;
+            background: #eef2ff;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .size-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e2f4e;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        #fontSizeSlider {
+            flex: 1;
+            cursor: pointer;
+            accent-color: #3b82f6;
+            height: 4px;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+        /* 融合后的字号数值 — 不再有突兀的背景框，仅以轻量文字显示 */
+        #fontSizeValue {
+            font-size: 0.8rem;
+            font-weight: 520;
+            color: #2563eb;
+            background: transparent;
+            padding: 0;
+            margin-left: 4px;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            min-width: 38px;
+            text-align: left;
+        }
+
+        /* 移动端：上下排列，两个模块各自占满宽度 */
+        @media (max-width: 680px) {
+            body {
+                padding: 0.8rem;
+            }
+            .toolbar {
+                padding: 1rem 1.2rem;
+            }
+            .preview-control-grid {
+                flex-direction: column;
+                gap: 0.9rem;
+            }
+            .text-group, .size-group {
+                width: 100%;
+            }
+            .size-group {
+                justify-content: space-between;
+            }
+            #fontSizeSlider {
+                flex: 1;
+            }
+        }
+
+        /* 字体卡片网格 (保留精致设计) */
+        .fonts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.4rem;
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+
+        .font-card {
+            background: #ffffff;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #eef2f8;
+            transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .font-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 28px -12px rgba(0, 0, 0, 0.12);
+            border-color: #cdd9f0;
+        }
+
+        .card-header {
+            background: #fbfdff;
+            padding: 0.7rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 0.6rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .file-name {
+            font-weight: 590;
+            font-size: 0.75rem;
+            background: #eef3ff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+            flex: 1;
+            color: #1e3a8a;
+        }
+        .file-size {
+            font-size: 0.65rem;
+            color: #4a5b7a;
+            font-family: monospace;
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            white-space: nowrap;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #8ba0bc;
+            width: 30px;
+            height: 30px;
+            border-radius: 30px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover {
+            background: #fee9e6;
+            color: #f43f5e;
+        }
+
+        .preview-area {
+            padding: 1.2rem 1rem;
+            background: #ffffff;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+        }
+        .sample-text {
+            line-height: 1.5;
+            word-break: break-word;
+            transition: font-size 0.05s ease;
+            color: #111827;
+            font-weight: 450;
+            width: 100%;
+        }
+
+        .load-status {
+            font-size: 0.7rem;
+            padding: 0.5rem 1rem;
+            background: #fafcff;
+            border-top: 1px solid #f0f4fa;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 450;
+        }
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #dce5f2;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            background: rgba(255,255,245,0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 2.5rem 1.2rem;
+            color: #3c5670;
+            font-weight: 470;
+            border: 1px solid #e4e9f2;
+        }
+
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6d7b93;
+            padding: 0.8rem;
+            border-top: 1px solid #e0e7f0;
+        }
+
+        .success-text { color: #15803d; font-weight: 480; display: flex; align-items: center; gap: 4px;}
+        .error-text { color: #c2410c; background: #fff4ed; padding: 0.1rem 0.6rem; border-radius: 2rem;}
+
+        @media (max-width: 480px) {
+            .fonts-grid {
+                grid-template-columns: 1fr;
+            }
+            .file-name {
+                max-width: 130px;
+            }
+            .card-header {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="toolbar">
+        <h1>✍️ 墨字集 · 字体批量预览</h1>
+        <div class="sub">优雅对比 · 实时调节 · 支持 TTF / OTF / WOFF / WOFF2</div>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂 ✨</div>
+            <p>点击或拖拽上传字体文件 (可多选)</p>
+            <p style="font-size:0.7rem; margin-top:6px; opacity:0.7">.ttf .otf .woff .woff2 格式 ｜ 浏览器本地加载</p>
+            <input type="file" id="fontFileInput" multiple accept=".ttf,.otf,.woff,.woff2,.TTF,.OTF,.WOFF,.WOFF2" style="display:none">
+        </div>
+
+        <div class="btn-group">
+            <button id="clearAllBtn" class="btn btn-outline">🗑️ 清空所有字体</button>
+            <div class="stats-badge" id="statsInfo">📦 0 款字体</div>
+        </div>
+
+        <!-- 全局预览微调区：预览文本上下两排 + 可滚动，字号数值融合设计 -->
+        <div class="control-bar">
+            <div class="preview-header">
+                🎨 全局预览微调
+                <span>同步所有卡片</span>
+            </div>
+            <div class="preview-control-grid">
+                <!-- 预览文本模块：上下结构，支持上下滑动 -->
+                <div class="text-group">
+                    <div class="text-label-row">
+                        <div class="text-icon">🔤</div>
+                        <label>预览文本</label>
+                    </div>
+                    <textarea id="previewTextInput" rows="2" placeholder="输入自定义预览文本...">字体效果展示 · 中文汉字排版 The quick brown fox jumps over the lazy dog · 1234567890</textarea>
+                </div>
+
+                <!-- 字号调节模块：干净融合，数值无凸出感 -->
+                <div class="size-group">
+                    <div class="size-icon">🔠</div>
+                    <label>字号</label>
+                    <input type="range" id="fontSizeSlider" min="12" max="48" value="20" step="1">
+                    <span id="fontSizeValue">20px</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fonts-grid" id="fontsGrid">
+        <div class="empty-state">
+            🧩 暂无字体，请轻触上方区域上传字体文件<br>
+            💡 每个字体单独加载 · 实时对比排版无压力
+        </div>
+    </div>
+    <footer>⚡ 纯本地字体预览工具 | 无溢出设计 | 所有字体实时调节字号/文本</footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- 字体数据 ----------
+        let fontItems = [];
+        let nextId = 1;
+
+        const fontsGrid = document.getElementById('fontsGrid');
+        const fontFileInput = document.getElementById('fontFileInput');
+        const dropZone = document.getElementById('dropZone');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const previewTextInput = document.getElementById('previewTextInput');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const statsInfo = document.getElementById('statsInfo');
+
+        let globalPreviewText = previewTextInput.value;
+        let globalFontSize = 20;
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function generateFamilyName(originalName) {
+            const clean = originalName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_').slice(0, 28);
+            return `font_preview_${Date.now()}_${nextId}_${clean}`;
+        }
+
+        function updateStats() {
+            const total = fontItems.length;
+            const successCount = fontItems.filter(i => i.status === 'success').length;
+            statsInfo.innerHTML = `📋 ${successCount}/${total} 字体已激活`;
+            if (total === 0) statsInfo.innerHTML = `📦 0 款字体`;
+        }
+
+        async function clearAllFonts() {
+            for (const item of fontItems) {
+                if (item.fontFace) {
+                    try { document.fonts.delete(item.fontFace); } catch(e) {}
+                }
+                if (item.dom && item.dom.card) item.dom.card.remove();
+            }
+            fontItems = [];
+            updateStats();
+            renderEmptyState();
+        }
+
+        async function deleteFontItem(itemId) {
+            const index = fontItems.findIndex(i => i.id === itemId);
+            if (index === -1) return;
+            const item = fontItems[index];
+            if (item.fontFace) {
+                try { document.fonts.delete(item.fontFace); } catch(e) {}
+            }
+            if (item.dom && item.dom.card) item.dom.card.remove();
+            fontItems.splice(index, 1);
+            updateStats();
+            if (fontItems.length === 0) renderEmptyState();
+        }
+
+        function renderEmptyState() {
+            fontsGrid.innerHTML = '';
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'empty-state';
+            emptyDiv.innerHTML = '✨ 暂无字体，请上传 .ttf / .otf / .woff / .woff2 文件进行排版对比<br>📌 支持批量拖拽，所见即所得';
+            fontsGrid.appendChild(emptyDiv);
+        }
+
+        function refreshAllPreviews() {
+            globalPreviewText = previewTextInput.value;
+            globalFontSize = parseInt(fontSizeSlider.value, 10);
+            fontSizeValue.innerText = globalFontSize + 'px';
+            for (const item of fontItems) {
+                if (item.dom && item.dom.sampleDiv) {
+                    item.dom.sampleDiv.innerText = globalPreviewText;
+                    item.dom.sampleDiv.style.fontSize = globalFontSize + 'px';
+                }
+            }
+        }
+
+        async function loadFont(item) {
+            const { file, familyName } = item;
+            try {
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                let format = 'truetype';
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext === 'otf') format = 'opentype';
+                else if (ext === 'woff') format = 'woff';
+                else if (ext === 'woff2') format = 'woff2';
+                
+                const fontFace = new FontFace(familyName, arrayBuffer, { style: 'normal', weight: 'normal' });
+                const loadedFont = await fontFace.load();
+                document.fonts.add(loadedFont);
+                item.fontFace = loadedFont;
+                item.status = 'success';
+                if (item.dom && item.dom.sampleDiv) {
+                    item.dom.sampleDiv.style.fontFamily = `"${familyName}", "SF Pro Text", system-ui, -apple-system, sans-serif`;
+                }
+                updateStatusUI(item, 'success');
+                updateStats();
+            } catch (err) {
+                console.error(`字体加载失败: ${file.name}`, err);
+                item.status = 'error';
+                item.errorMsg = err.message || '不支持的字体格式或文件损坏';
+                if (item.dom && item.dom.sampleDiv) {
+                    item.dom.sampleDiv.style.fontFamily = `'JetBrains Mono', monospace`;
+                }
+                updateStatusUI(item, 'error');
+                updateStats();
+            }
+        }
+
+        function updateStatusUI(item, status) {
+            if (!item.dom || !item.dom.statusDiv) return;
+            const statusDiv = item.dom.statusDiv;
+            if (status === 'loading') {
+                statusDiv.innerHTML = `<span class="spinner"></span> 字体解析中...`;
+            } else if (status === 'success') {
+                statusDiv.innerHTML = `<span class="success-text">✓ 字体已激活 · 实时预览</span>`;
+            } else if (status === 'error') {
+                statusDiv.innerHTML = `<span class="error-text">⚠️ 加载失败: ${item.errorMsg || '无效格式'}</span>`;
+            }
+        }
+
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('文件读取失败'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function createCard(item) {
+            const card = document.createElement('div');
+            card.className = 'font-card';
+            card.dataset.id = item.id;
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'file-name';
+            nameSpan.title = item.file.name;
+            let displayName = item.file.name;
+            if (displayName.length > 42) displayName = displayName.slice(0, 39) + '…';
+            nameSpan.innerText = displayName;
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'file-size';
+            sizeSpan.innerText = formatFileSize(item.file.size);
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-btn';
+            delBtn.innerHTML = '✕';
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteFontItem(item.id);
+            });
+            header.appendChild(nameSpan);
+            header.appendChild(sizeSpan);
+            header.appendChild(delBtn);
+
+            const previewArea = document.createElement('div');
+            previewArea.className = 'preview-area';
+            const sampleDiv = document.createElement('div');
+            sampleDiv.className = 'sample-text';
+            sampleDiv.innerText = globalPreviewText;
+            sampleDiv.style.fontSize = globalFontSize + 'px';
+            sampleDiv.style.fontFamily = `system-ui, -apple-system, sans-serif`;
+            previewArea.appendChild(sampleDiv);
+
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'load-status';
+            statusDiv.innerHTML = `<span class="spinner"></span> 准备加载...`;
+
+            card.appendChild(header);
+            card.appendChild(previewArea);
+            card.appendChild(statusDiv);
+
+            return { card, sampleDiv, statusDiv };
+        }
+
+        async function handleFiles(files) {
+            if (!files.length) return;
+            const validFiles = [];
+            for (let f of files) {
+                const ext = f.name.split('.').pop().toLowerCase();
+                if (['ttf', 'otf', 'woff', 'woff2'].includes(ext)) validFiles.push(f);
+                else console.warn(`跳过不支持文件: ${f.name}`);
+            }
+            if (validFiles.length === 0) {
+                alert("未检测到有效字体文件，请上传 .ttf/.otf/.woff/.woff2 格式");
+                return;
+            }
+
+            const emptyDiv = fontsGrid.querySelector('.empty-state');
+            if (emptyDiv && fontItems.length === 0) emptyDiv.remove();
+
+            for (const file of validFiles) {
+                const id = nextId++;
+                const familyName = generateFamilyName(file.name);
+                const item = {
+                    id, file, fontFace: null, status: 'loading', familyName,
+                    errorMsg: null, dom: null
+                };
+                const { card, sampleDiv, statusDiv } = createCard(item);
+                item.dom = { card, sampleDiv, statusDiv };
+                fontsGrid.appendChild(card);
+                fontItems.push(item);
+                updateStatusUI(item, 'loading');
+                loadFont(item);
+            }
+            updateStats();
+        }
+
+        // 事件绑定
+        fontFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFiles(Array.from(e.target.files));
+            fontFileInput.value = '';
+        });
+        dropZone.addEventListener('click', () => fontFileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#fef9e6';
+            dropZone.style.borderColor = '#3b82f6';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = '#fefdf7';
+            dropZone.style.borderColor = '#bac8dc';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#fefdf7';
+            dropZone.style.borderColor = '#bac8dc';
+            const files = e.dataTransfer.files;
+            if (files.length) handleFiles(Array.from(files));
+        });
+        clearAllBtn.addEventListener('click', () => {
+            if (fontItems.length > 0 && confirm('确定移除所有字体吗？清空后不可恢复')) clearAllFonts();
+            else if (!fontItems.length) alert('没有字体需要清除');
+        });
+        previewTextInput.addEventListener('input', () => refreshAllPreviews());
+        fontSizeSlider.addEventListener('input', () => refreshAllPreviews());
+
+        fontSizeValue.innerText = globalFontSize + 'px';
+        if (fontItems.length === 0) renderEmptyState();
+    })();
+</script>
+</body>
+</html>
