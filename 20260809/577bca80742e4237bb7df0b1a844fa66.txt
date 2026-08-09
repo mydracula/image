@@ -1,0 +1,9 @@
+2025-05-09 06:16:49.491/TRACE: 开始运行[/data/user/0/com.scyz.gjx/files/project/main.js]
+2025-10-07 22:15:05.932/TRACE: 开始运行[/data/user/0/com.scyz.gjx/files/project/main.js]
+2025-10-07 22:15:09.559/TRACE: 
+------------
+[/data/user/0/com.scyz.gjx/files/project/main.js]运行结束，用时3.626000秒
+2026-02-07 14:08:13.253/TRACE: 开始运行[/data/user/0/com.scyz.gjx/files/project/main.js]
+2026-02-07 14:08:18.056/TRACE: 
+------------
+[/data/user/0/com.scyz.gjx/files/project/main.js]运行结束，用时4.802000秒
