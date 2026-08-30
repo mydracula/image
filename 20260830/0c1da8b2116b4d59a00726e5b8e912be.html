@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>文章阅读 - 第1卷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {background:#f8fafc;min-height:100vh;}
+        /* 灰色未解锁：彻底禁止点击 */
+        .item-lock{background:#e5e7eb;color:#666;pointer-events:none !important;}
+        .item-unlock{background:#ffffff;cursor:pointer;}
+        .btn-visual-disabled{background:#9ca3af;opacity:0.5;}
+    </style>
+</head>
+<body class="p-4 pb-24">
+<div class="max-w-lg mx-auto">
+    <h1 class="text-xl font-bold text-center my-4 text-indigo-600">文章阅读 第1卷(1‑20)</h1>
+    <div class="text-sm text-gray-600 text-center mb-4">
+        <div>今日剩余解锁额度：<span id="remain">2</span></div>
+        <div>本卷已解锁至第：<span id="unlockMax">0</span> 篇</div>
+        <div id="vipTip" class="text-rose-500 mt-1 hidden">✅VIP已解锁本卷全部内容</div>
+    </div>
+
+    <!--文章写死HTML，永远不会消失-->
+    <div id="listBox" class="space-y-3">
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="1" data-title="第1篇 示例标题" data-content="第1篇文章内容">1. 第1篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="2" data-title="第2篇 示例标题" data-content="第2篇文章内容">2. 第2篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="3" data-title="第3篇 示例标题" data-content="第3篇文章内容">3. 第3篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="4" data-title="第4篇 示例标题" data-content="第4篇文章内容">4. 第4篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="5" data-title="第5篇 示例标题" data-content="第5篇文章内容">5. 第5篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="6" data-title="第6篇 示例标题" data-content="第6篇文章内容">6. 第6篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="7" data-title="第7篇 示例标题" data-content="第7篇文章内容">7. 第7篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="8" data-title="第8篇 示例标题" data-content="第8篇文章内容">8. 第8篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="9" data-title="第9篇 示例标题" data-content="第9篇文章内容">9. 第9篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="10" data-title="第10篇 示例标题" data-content="第10篇文章内容">10. 第10篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="11" data-title="第11篇 示例标题" data-content="第11篇文章内容">11. 第11篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="12" data-title="第12篇 示例标题" data-content="第12篇文章内容">12. 第12篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="13" data-title="第13篇 示例标题" data-content="第13篇文章内容">13. 第13篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="14" data-title="第14篇 示例标题" data-content="第14篇文章内容">14. 第14篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="15" data-title="第15篇 示例标题" data-content="第15篇文章内容">15. 第15篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="16" data-title="第16篇 示例标题" data-content="第16篇文章内容">16. 第16篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="17" data-title="第17篇 示例标题" data-content="第17篇文章内容">17. 第17篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="18" data-title="第18篇 示例标题" data-content="第18篇文章内容">18. 第18篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="19" data-title="第19篇 示例标题" data-content="第19篇文章内容">19. 第19篇 示例标题</div>
+        <div class="article-item p-4 rounded-lg border border-gray-300" data-index="20" data-title="第20篇 示例标题" data-content="第20篇文章内容">20. 第20篇 示例标题</div>
+    </div>
+
+    <div class="flex justify-center mt-8 gap-3">
+        <button id="nextBtn" class="px-6 py-3 rounded-lg text-white btn-visual-disabled">下一卷</button>
+        <button id="vipAllBtn" class="px-6 py-3 bg-rose-500 text-white rounded-lg">阅读全部(VIP)</button>
+    </div>
+</div>
+
+<!--文章阅读弹窗-->
+<div id="articleModal" class="fixed inset-0 bg-black/60 hidden z-50">
+    <div class="bg-white h-full overflow-auto p-5">
+        <button id="closeModal" class="mb-4 px-3 py-1 bg-gray-200 rounded">关闭返回</button>
+        <h2 id="modTitle" class="text-lg font-bold mb-3"></h2>
+        <div id="modContent" class="text-gray-700 leading-relaxed"></div>
+    </div>
+</div>
+
+<!--下一卷提示弹窗-->
+<div id="tipModal" class="fixed inset-0 bg-black/50 hidden z-[100] flex items-center justify-center">
+    <div class="bg-white p-6 rounded-xl max-w-[85%]">
+        <p class="mb-5">⚠️请先完成本卷全部20篇文章，才可以解锁下一卷！</p>
+        <button id="closeTip" class="w-full py-2 bg-indigo-600 text-white rounded-lg">知道了</button>
+    </div>
+</div>
+
+<!--VIP口令弹窗-->
+<div id="vipPwdModal" class="fixed inset-0 bg-black/50 hidden z-[100] flex items-center justify-center">
+    <div class="bg-white p-6 rounded-xl max-w-[85%] w-full">
+        <h3 class="font-bold text-lg mb-4">VIP解锁本卷全部内容</h3>
+        <input id="pwdInput" type="text" placeholder="请输入VIP口令" class="w-full border p-3 rounded mb-4"/>
+        <div class="flex gap-2">
+            <button id="vipCancel" class="flex-1 py-2 bg-gray-300 rounded-lg">取消</button>
+            <button id="vipConfirm" class="flex-1 py-2 bg-rose-500 text-white rounded-lg">确认解锁</button>
+        </div>
+        <div id="pwdErr" class="text-red-500 mt-3 hidden">口令错误，请重新输入</div>
+    </div>
+</div>
+
+<script>
+// =========配置区=========
+const NEXT_PAGE_URL = "这里填入page2的部署链接";
+const VIP_PASSWORD = "c12345zk";
+const VOL_KEY = "vol1";
+
+//本地存储
+let data = JSON.parse(localStorage.getItem("read_data")) || {
+    lastDay:"",
+    dayRemain:2,
+    unlockMax:0,
+    vipUnlockVolume:{}
+};
+
+function saveStorage(){
+    localStorage.setItem("read_data", JSON.stringify(data));
+}
+
+//每日重置次数
+const now = new Date();
+const todayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+if(data.lastDay !== todayStr){
+    data.lastDay = todayStr;
+    data.dayRemain = 2;
+    saveStorage();
+}
+
+//dom获取
+const listBox = document.querySelector("#listBox");
+const remainDom = document.querySelector("#remain");
+const unlockMaxDom = document.querySelector("#unlockMax");
+const vipTip = document.querySelector("#vipTip");
+const nextBtn = document.querySelector("#nextBtn");
+const vipAllBtn = document.querySelector("#vipAllBtn");
+const articleModal = document.querySelector("#articleModal");
+const modTitle = document.querySelector("#modTitle");
+const modContent = document.querySelector("#modContent");
+const closeModal = document.querySelector("#closeModal");
+const tipModal = document.querySelector("#tipModal");
+const closeTip = document.querySelector("#closeTip");
+const vipPwdModal = document.querySelector("#vipPwdModal");
+const pwdInput = document.querySelector("#pwdInput");
+const vipCancel = document.querySelector("#vipCancel");
+const vipConfirm = document.querySelector("#vipConfirm");
+const pwdErr = document.querySelector("#pwdErr");
+
+//关闭弹窗
+closeTip.onclick = ()=> tipModal.classList.add("hidden");
+closeModal.onclick = ()=> articleModal.classList.add("hidden");
+vipCancel.onclick = ()=> vipPwdModal.classList.add("hidden");
+
+//下一卷按钮逻辑：无disabled属性，纯css视觉灰色
+nextBtn.onclick = function(){
+    if(data.unlockMax >=20 && NEXT_PAGE_URL){
+        location.href=NEXT_PAGE_URL;
+    }else{
+        tipModal.classList.remove("hidden");
+    }
+};
+
+//打开VIP弹窗
+vipAllBtn.onclick = function(){
+    pwdInput.value="";
+    pwdErr.classList.add("hidden");
+    vipPwdModal.classList.remove("hidden");
+};
+
+//VIP确认
+vipConfirm.onclick = function(){
+    const inputVal = pwdInput.value.trim();
+    if(inputVal === VIP_PASSWORD){
+        data.vipUnlockVolume[VOL_KEY] = true;
+        saveStorage();
+        vipPwdModal.classList.add("hidden");
+        alert("VIP解锁成功！");
+        renderUi();
+    }else{
+        pwdErr.classList.remove("hidden");
+    }
+};
+
+//父盒子事件委托，只做点击处理，不在循环绑定事件
+listBox.addEventListener("click",function(e){
+    const target = e.target.closest(".article-item");
+    if(!target) return;
+    const idx = Number(target.dataset.index);
+    const title = target.dataset.title;
+    const content = target.dataset.content;
+    const isVip = !!data.vipUnlockVolume[VOL_KEY];
+
+    if(isVip){
+        modTitle.innerText = title;
+        modContent.innerText = content;
+        articleModal.classList.remove("hidden");
+        return;
+    }
+    //普通用户
+    if(idx <= data.unlockMax){
+        modTitle.innerText = title;
+        modContent.innerText = content;
+        articleModal.classList.remove("hidden");
+    }else if(idx === data.unlockMax + 1 && data.dayRemain>0){
+        data.unlockMax = idx;
+        data.dayRemain -= 1;
+        saveStorage();
+        renderUi();
+    }
+});
+
+//渲染：只改class、文字；**不绑定任何点击事件**，点击交给外层listBox委托
+function renderUi(){
+    const isVip = !!data.vipUnlockVolume[VOL_KEY];
+    remainDom.innerText = data.dayRemain;
+    unlockMaxDom.innerText = data.unlockMax;
+    vipTip.classList.toggle("hidden", !isVip);
+
+    const items = document.querySelectorAll(".article-item");
+    items.forEach(el=>{
+        const idx = Number(el.dataset.index);
+        const title = el.dataset.title;
+        el.className = "article-item p-4 rounded-lg border";
+
+        if(isVip){
+            el.classList.add("item-unlock","border-rose-400");
+            el.innerText = idx + ". " + title + " 【VIP】";
+        }else{
+            el.innerText = idx + ". " + title;
+            if(idx <= data.unlockMax){
+                el.classList.add("item-unlock","border-indigo-500");
+            }else{
+                el.classList.add("item-lock","border-gray-300");
+                if(idx === data.unlockMax +1 && data.dayRemain>0){
+                    el.classList.remove("item-lock");
+                    el.classList.add("item-unlock","border-green-400");
+                }
+            }
+        }
+    });
+
+    if(data.unlockMax >=20 && NEXT_PAGE_URL){
+        nextBtn.className = "px-6 py-3 rounded-lg text-white bg-indigo-600";
+    }else{
+        nextBtn.className = "px-6 py-3 rounded-lg text-white btn-visual-disabled";
+    }
+}
+
+renderUi();
+</script>
+</body>
+</html>
