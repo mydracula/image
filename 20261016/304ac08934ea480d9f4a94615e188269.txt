@@ -1,0 +1,7 @@
+--------------------------yvDBvookfYCzyVmNk5CSmm
+Content-Disposition: attachment; name="file"; filename="t.txt"
+Content-Type: text/plain
+
+hello glm test Fri Oct 16 17:27:33     2026
+
+--------------------------yvDBvookfYCzyVmNk5CSmm--
