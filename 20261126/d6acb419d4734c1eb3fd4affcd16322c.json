@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "schema_version": 2,
+    "created_at": "2026-11-26",
+    "last_run": "2026-11-26",
+    "run_result": "no_new_channels",
+    "baseline_note": "首次运行时 state.json 缺失，2026-11-23 的 5 条基线无法恢复。本次重建后，用户确认上一轮推荐的 heygen-voice-1-turbo-free 与 aliyun-voice-studio-free-quota 均为历史重复渠道（已标记 duplicate=true），故今日无真正新增。",
+    "storage": {
+      "provider": "file.sang.pub · github (可长期托管)",
+      "pointer_file": "latest_url.txt",
+      "note": "每次上传得到新 URL；最新 URL 记录在 latest_url.txt，并回填 latest_remote_url 字段。"
+    },
+    "latest_remote_url": ""
+  },
+  "channels": [
+    {
+      "id": "heygen-voice-1-turbo-free",
+      "name": "HeyGen Voice Turbo (free)",
+      "provider": "HeyGen（经 OpenRouter / HeyGen Platform）",
+      "type": "官方 + 三方聚合",
+      "official_domain": "heygen.com",
+      "category": "TTS",
+      "free_policy": "限时免费：$0 / 百万字符，至 2026-11-30（之后 $4 / 百万字符）",
+      "free_type": "limited_time",
+      "api": "OpenAI 兼容 /v1/audio/speech；OpenRouter 模型 id: heygen/heygen-voice-1-turbo:free；或 HeyGen Platform API Key",
+      "models": ["heygen-voice-1-turbo"],
+      "requires_card": false,
+      "limits": "OpenRouter 免费端点有限速（RPM 待核实）；单次最多 5000 字符；10 个内置音色；39 语言；44.1kHz 单声道 PCM；音色克隆需自有 HeyGen Key（BYOK，不计入免费）",
+      "expires": "2026-11-30",
+      "links": [
+        "https://openrouter.ai/heygen/heygen-voice-1-turbo:free",
+        "https://releasebot.io/updates/heygen/heygen"
+      ],
+      "first_seen": "2026-11-26",
+      "last_verified": "2026-11-26",
+      "status": "active",
+      "pushed": true,
+      "pushed_at": "2026-11-26",
+      "duplicate": true,
+      "duplicate_note": "用户 2026-11-26 确认：与历史批次重复，非新增，不再推送。",
+      "notes": "模型 2026-10-26 上线；免费窗口至 2026-11-30；无需绑卡。"
+    },
+    {
+      "id": "aliyun-voice-studio-free-quota",
+      "name": "阿里云 Voice Studio（伶鹊）限时免费额度",
+      "provider": "阿里云（Alibaba Cloud）",
+      "type": "官方",
+      "official_domain": "aliyun.com",
+      "category": "TTS",
+      "free_policy": "限时免费：可领 10 万个 TTS 计费字符，有效期 30 个自然日（自领取日算）",
+      "free_type": "limited_time",
+      "api": "API Key 调用：实时 TTS WebSocket API + 非实时同步/流式/异步 TTS 接口",
+      "models": ["Voice Studio TTS 音色（具体模型名待核实）"],
+      "requires_card": "待核实",
+      "limits": "10 万计费字符（汉字按 2 字符计）；超量/到期后按量计费；每主账号限领 1 次；需先开通 Voice Studio 服务",
+      "expires": "领取后 30 天；活动结束时间另行通知",
+      "links": [
+        "https://help.aliyun.com/zh/ccs/voice-studio/product-overview/limited-time-free-quota"
+      ],
+      "first_seen": "2026-11-26",
+      "last_verified": "2026-11-26",
+      "status": "active",
+      "pushed": true,
+      "pushed_at": "2026-11-26",
+      "duplicate": true,
+      "duplicate_note": "用户 2026-11-26 确认：与历史批次重复，非新增，不再推送。",
+      "notes": "活动 2026 年 10 月上线；需阿里云账号/实名，是否需绑卡待核实。"
+    }
+  ],
+  "excluded": [
+    {"id": "fish-audio", "name": "Fish Audio（S2.1 Pro Free / Drama 3 等）", "official_domain": "fish.audio", "reason": "规则3：免费策略不可持续，明确排除", "status": "excluded_by_rule"},
+    {"id": "mimo-tts", "name": "MiMo TTS（小米，含 Voice Design/Clone）", "official_domain": "xiaomi.com", "reason": "规则3：明确排除 MisoTTS/mimotts 同类", "status": "excluded_by_rule"},
+    {"id": "google-ai-studio", "name": "Google AI Studio / Gemini TTS", "official_domain": "aistudio.google.com", "reason": "规则4：长期常规 free tier，不属限时/公测", "status": "excluded_by_rule"},
+    {"id": "groq", "name": "Groq Audio", "official_domain": "groq.com", "reason": "规则4：长期常规 free tier", "status": "excluded_by_rule"},
+    {"id": "cloudflare-workers-ai", "name": "Cloudflare Workers AI（Aura / MiniMax / Gemini TTS）", "official_domain": "cloudflare.com", "reason": "规则4：10000 Neurons/天 为长期常规免费额度", "status": "excluded_by_rule"},
+    {"id": "modelscope-inference", "name": "魔搭 ModelScope 免费推理 API", "official_domain": "modelscope.cn", "reason": "规则4：长期常规免费推理额度", "status": "excluded_by_rule"},
+    {"id": "elevenlabs", "name": "ElevenLabs（含 Scribe v3, 2026-11-10）", "official_domain": "elevenlabs.io", "reason": "规则4：长期常规 free tier（10k credits/月）", "status": "excluded_by_rule"},
+    {"id": "assemblyai", "name": "AssemblyAI（STT-3.7, 2026-11-18）", "official_domain": "assemblyai.com", "reason": "规则4：$50 长期免费额度，非限时活动", "status": "excluded_by_rule"},
+    {"id": "deepgram", "name": "Deepgram（Nova-3 / Flux TTS）", "official_domain": "deepgram.com", "reason": "规则4：长期免费额度；Flux TTS free 发布 2026-08-12 已超 30 天", "status": "excluded_by_rule"},
+    {"id": "stability-stable-audio", "name": "Stability AI Stable Audio", "official_domain": "stability.ai", "reason": "规则4：25 免费 credits 为常规额度，模型 2026-05 发布超 30 天", "status": "excluded_by_rule"},
+    {"id": "qwen3-tts-openweights", "name": "Qwen3-TTS（开源权重 / DashScope 90 天新用户额度）", "official_domain": "qwen.ai", "reason": "规则4：仅开源权重或常规新用户额度，非限时活动", "status": "excluded_by_rule"},
+    {"id": "gmi-cloud-minimax-week", "name": "GMI Cloud MiniMax Speech 2.8（MiniMax Week 免费）", "official_domain": "gmicloud.ai", "reason": "已失效：免费窗口 2026-08-24 至 09-06 已结束", "status": "expired"},
+    {"id": "stepfun-stepaudio3", "name": "StepFun StepAudio 3（语音+音乐）", "official_domain": "stepfun.com", "reason": "已失效：限时免费至 2026-11-17 23:59 已结束", "status": "expired"},
+    {"id": "reson8-rumble-2-flash", "name": "Reson8 Rumble-2-Flash", "official_domain": "reson8.nl", "reason": "规则4：仅开源权重(2026-11-25)，托管 API 为付费，无免费托管", "status": "not_eligible"},
+    {"id": "huggingface-phonon-tts", "name": "Hugging Face Phonon TTS", "official_domain": "huggingface.co", "reason": "规则4：端侧/开源权重，无免费托管 API", "status": "not_eligible"},
+    {"id": "together-qwen3-tts", "name": "Together AI Qwen3 TTS（2026-11-20）", "official_domain": "together.ai", "reason": "付费（$20/百万字符），非免费", "status": "not_eligible"},
+    {"id": "mureka", "name": "昆仑万维 Mureka 音乐生成 API", "official_domain": "mureka.ai", "reason": "付费，无免费额度", "status": "not_eligible"},
+    {"id": "tencent-hunyuan-asr-beta", "name": "腾讯云混元 ASR 内测版（Hy-ASR-3.0-preview, 2026-11-16）", "official_domain": "cloud.tencent.com", "reason": "待核实：内测仅 20 路免费并发，用量按大模型2.0计费，是否免费不明确", "status": "pending_verify"},
+    {"id": "easyvoice", "name": "EasyVoice（OpenAI 兼容 TTS）", "official_domain": "easyvoice.ae", "reason": "规则4：5000 字符/天为长期 freemium 免费额度；上线时间待核实", "status": "excluded_by_rule"}
+  ]
+}
